@@ -1,4 +1,4 @@
-const agent= require("../module/agent");
+import  agent from "../module/agent.js";
 
 class AgentControl{
     static async ajoutAgent(res,req){
@@ -11,4 +11,4 @@ class AgentControl{
        }
     }
     
-module.exports=AgentControl;
+  export default    AgentControl;

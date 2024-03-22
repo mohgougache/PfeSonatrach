@@ -1,4 +1,5 @@
-const db=require("../baseDonne/connection");
+import db from "../baseDonne/connection.js"
+
 class logModele{
 
 
@@ -15,4 +16,4 @@ static async verfie(id,password)
     })
  })
 }}
-module.exports=logModele;
+export default logModele;

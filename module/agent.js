@@ -1,4 +1,4 @@
-const db=require("../baseDonne/connection");
+import db from "../baseDonne/connection.js"
 class AgentModule{
     static async addAgent(Division, Direction, Unite, Service, Atelier, Nom, Prenom, DateN, LieuN, Sex, SitutionFamille, Adreese, GroupeSanguim, Allergie, Nss, Scolaire, Professionnelle, Qprofessionnelle, ActiProAntet, ServiceNational){
         
@@ -29,4 +29,4 @@ class AgentModule{
 
     
 }
-module.exports=AgentModule;
+export default AgentModule ;

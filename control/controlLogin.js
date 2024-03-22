@@ -1,4 +1,6 @@
-const login= require("../module/login");
+import login from"../module/login.js";
+
+
 class loginController{
     static async verficontrol(req,res){
       const { id, password } = req.body;
@@ -26,4 +28,4 @@ class loginController{
 
 
     }
-    module.exports=loginController;
+    export default  loginController;
