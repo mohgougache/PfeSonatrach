@@ -9,6 +9,32 @@ class AgentControl{
             res.send();
         }
        }
+       static async selctAgent(req,res){
+        console.log(req.body);
+        const { nom, prenom,Nss} = req.body;
+    
+        let results = await agent.selectAgent(nom, prenom,Nss);
+        if(results){
+            res.send(results);
+           console.log(results);
+        }
+        else {
+            res.status(401).json({ error: "il ya problame dans la requit" });
+          
+        }
+       }
+       static async selctALLagent(req,res){
+        let results = await agent.getagent();
+        if(results){
+            res.send(results);
+           console.log(results);
+        }
+        else {
+            res.status(401).json({ error: "il ya problame dans la requit" });
+          
+        }
+       }
+       
     }
     
   export default    AgentControl;

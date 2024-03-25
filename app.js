@@ -1,5 +1,5 @@
 import express from 'express';
-import cors from "cors"
+import cors from "cors";
 import session from "express-session";
 import bodyParser from "body-parser";
 import router from  "./router/router.js";

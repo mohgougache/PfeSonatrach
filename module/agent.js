@@ -26,7 +26,20 @@ class AgentModule{
             })
         })
     }
-
+    static async getagent()
+    {
+     return new Promise(resolve =>{
+        db.query("SELECT * FROM agent" ,[],(error,result)=>{
+            if(!error){
+                resolve(result)
+            }
+            if(error){
+                console.log(error);
+               resolve(error);
+            }
+        })
+     })
+    }
     
 }
 export default AgentModule ;
