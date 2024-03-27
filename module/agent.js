@@ -14,22 +14,25 @@ class AgentModule{
             })
         })
         }
-    static async selectAgent(nom,prenom,Nss){
-        return new Promise(resolve => {
-            db.query("select * from agent WHERE Nom = ? AND Prenom = ? AND NSS + ?", [nom, prenom,Nss],(error,result)=>{
-                if(!error){
-                    resolve(result);
-                }
-                if(error){
-                    console.log(error);
-                }
-            })
-        })
-    }
-    static async getagent()
+    
+    static async getagentall()
     {
      return new Promise(resolve =>{
-        db.query("SELECT * FROM agent" ,[],(error,result)=>{
+        db.query("SELECT Nom, Prenom, Sex, DateN, Nss FROM agent  " ,[],(error,result)=>{
+            if(!error){
+                resolve(result)
+            }
+            if(error){
+                console.log(error);
+               resolve(error);
+            }
+        })
+     })
+    }
+    static async getagent(IdA)
+    {
+     return new Promise(resolve =>{
+        db.query("SELECT * FROM agent WHERE IdA  = ?  " ,[IdA],(error,result)=>{
             if(!error){
                 resolve(result)
             }

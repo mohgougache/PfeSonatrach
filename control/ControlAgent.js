@@ -9,11 +9,9 @@ class AgentControl{
             res.send();
         }
        }
-       static async selctAgent(req,res){
-        console.log(req.body);
-        const { nom, prenom,Nss} = req.body;
-    
-        let results = await agent.selectAgent(nom, prenom,Nss);
+      
+       static async selctALLagent(req,res){
+        let results = await agent.getagentall();
         if(results){
             res.send(results);
            console.log(results);
@@ -23,8 +21,10 @@ class AgentControl{
           
         }
        }
-       static async selctALLagent(req,res){
-        let results = await agent.getagent();
+       static async selctagent(req,res){
+        console.log(req.body);
+        const IdA = req.body;
+        let results = await agent.getagent(IdA);
         if(results){
             res.send(results);
            console.log(results);
@@ -37,4 +37,4 @@ class AgentControl{
        
     }
     
-  export default    AgentControl;
+  export default  AgentControl;
