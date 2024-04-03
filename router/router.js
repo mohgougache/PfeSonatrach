@@ -5,10 +5,9 @@ import controlA from "../control/ControlAgent.js";
 const router = express.Router();
 
 router.post("/api/login", controll.verficontrol);
-router.post("/api/ajouter", controlA.ajoutAgent);
+router.post("/api/ajouter", controlA.insertAgentWithPostes);
 router.get("/api/agentall", controlA.selctALLagent);
 router.get("/api/agent", controlA.selctagent);
 router.delete("/api/supagent", controlA.supAgent)
 router.put("/api/modifagent/:IdA", controlA.modifAgent);
-
 export default router;

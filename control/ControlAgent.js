@@ -1,24 +1,59 @@
 import  agent from "../module/agent.js";
 
 class AgentControl{
-    static async ajoutAgent(req, res) {
+    // static async ajoutAgent(req, res) {
         
-        try {
-            let x = await agent.addAgent(
-               req.body
-            );
+    //     try {
+    //         let x = await agent.addAgent(
+    //            req.body
+    //         );
     
             
-            if (x == true) {
-                res.send("Successfully");
-            } else {
-                res.send("Failed");
-            }
+    //         if (x == true) {
+    //             res.send("Successfully");
+    //         } else {
+    //             res.send("Failed");
+    //         }
+    //     } catch (error) {
+    //         console.error("Erreur lors de l'ajout de l'agent :", error);
+    //         res.status(500).json({ error: "Erreur lors de l'ajout de l'agent" });
+    //     }
+    // }
+    static async insertAgentWithPostes(req, res) {
+        try {
+            const agentData = req.body.agent;
+            const postesData = req.body.postes;
+    
+            // Insérer l'agent
+            const agentId = await new Promise((resolve, reject) => {
+                agent.insertAgent(agentData, (error, agentId) => {
+                    if (error) {
+                        console.error("Erreur lors de l'insertion de l'agent :", error);
+                        reject("Erreur lors de l'insertion de l'agent");
+                    } else {
+                        resolve(agentId);
+                    }
+                });
+            });
+    
+            const postesWithAgentId = postesData.map(poste => ({ ...poste, IdA: agentId }));
+            await new Promise((resolve, reject) => {
+                agent.insertPostes(postesWithAgentId, (error) => {
+                    if (error) {
+                        console.error("Erreur lors de l'insertion des postes :", error);
+                        reject("Erreur lors de l'insertion des postes");
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+    
+            res.status(201).json({ message: 'Agent inséré avec succès avec ses postes associés' });
         } catch (error) {
-            console.error("Erreur lors de l'ajout de l'agent :", error);
-            res.status(500).json({ error: "Erreur lors de l'ajout de l'agent" });
+            res.status(500).json({ error });
         }
     }
+    
     
        static async selctALLagent(req,res){
         let results = await agent.getagentall();
