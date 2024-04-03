@@ -4,7 +4,7 @@ class AgentControl{
     
     static async insertAgentWithPostes(req, res) {
         try {
-            const agentData = req.body.agent;
+            const agentData = req.body;
             const postesData = req.body.postes;
     
             // Insérer l'agent
