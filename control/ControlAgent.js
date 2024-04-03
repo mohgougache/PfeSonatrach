@@ -1,24 +1,7 @@
 import  agent from "../module/agent.js";
 
 class AgentControl{
-    // static async ajoutAgent(req, res) {
-        
-    //     try {
-    //         let x = await agent.addAgent(
-    //            req.body
-    //         );
     
-            
-    //         if (x == true) {
-    //             res.send("Successfully");
-    //         } else {
-    //             res.send("Failed");
-    //         }
-    //     } catch (error) {
-    //         console.error("Erreur lors de l'ajout de l'agent :", error);
-    //         res.status(500).json({ error: "Erreur lors de l'ajout de l'agent" });
-    //     }
-    // }
     static async insertAgentWithPostes(req, res) {
         try {
             const agentData = req.body.agent;

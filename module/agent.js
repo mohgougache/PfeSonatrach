@@ -1,21 +1,5 @@
 import db from "../baseDonne/connection.js"
 class AgentModule{
-    // static async addAgent(data){
-       
-    //     return new Promise(resolve=>{
-    //         db.query("INSERT INTO `agent`(Division, Direction, Unite, Service, Atelier, Nom, Prenom, DateN, LieuN, Sex, SitutionFamille, Adreese, GroupeSanguim, Allergie, Nss, Scolaire, Professionnelle, Qprofessionnelle, ActiProAntet, ServiceNational) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)    ",[data.Division, data.Direction, data.Unite, data.Service, data.Atelier, data.Nom, data.Prenom, data.DateN, data.LieuN, data.Sex, data.SitutionFamille, data.Adreese, data.GroupeSanguim, data.Allergie, data.Nss, data.Scolaire, data.Professionnelle, data.Qprofessionnelle, data.ActiProAntet, data.ServiceNational],(error,result)=>{   
-             
-    //             if(!error){
-    //                 resolve(true);
-    //             }
-    //             if(error){
-    //                 resolve(false);
-    //                 console.log(error);
-    //             }
-        
-    //         })
-    //     })
-    //     }
     static insertAgent(agentData, callback) {
         db.query("INSERT INTO `agent`(Division, Direction, Unite, Service, Atelier, Nom, Prenom, DateN, LieuN, Sex, SitutionFamille, Adreese, GroupeSanguim, Allergie, Nss, Scolaire, Professionnelle, Qprofessionnelle, ActiProAntet, ServiceNational) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [agentData.Division, agentData.Direction, agentData.Unite, agentData.Service, agentData.Atelier, agentData.Nom, agentData.Prenom, agentData.DateN, agentData.LieuN, agentData.Sex, agentData.SitutionFamille, agentData.Adreese, agentData.GroupeSanguim, agentData.Allergie, agentData.Nss, agentData.Scolaire, agentData.Professionnelle, agentData.Qprofessionnelle, agentData.ActiProAntet, agentData.ServiceNational], (error, agentResult) => {
             if (error) {
