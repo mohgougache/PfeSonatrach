@@ -58,29 +58,67 @@ db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) V
       
           });
     }
-    static async delltAgent(id){
-        return new Promise(resolve=>{
-         db.query("DELETE FROM agent WHERE IdA=?",[id],(error,result)=>{
-             if(!error){
-                resolve(true)
-             } else 
-             resolve(false);
-         })
-        })
-     } 
-     static updateAgent(IdA, newData) {
-        return new Promise((resolve, reject) => {
-            const { Division, Direction, Unite, Service, Atelier, Nom, Prenom, DateN, LieuN, Sex, SitutionFamille, Adreese, GroupeSanguim, Allergie, Nss, Scolaire, Professionnelle, Qprofessionnelle, ActiProAntet, ServiceNational } = newData;
-            const sql = `UPDATE agent SET Division=?, Direction=?, Unite=?, Service=?, Atelier=?, Nom=?, Prenom=?, DateN=?, LieuN=?, Sex=?, SitutionFamille=?, Adreese=?, GroupeSanguim=?, Allergie=?, Nss=?, Scolaire=?, Professionnelle=?, Qprofessionnelle=?, ActiProAntet=?, ServiceNational=? WHERE IdA=?`;
-
-            db.query(sql, [Division, Direction, Unite, Service, Atelier, Nom, Prenom, DateN, LieuN, Sex, SitutionFamille, Adreese, GroupeSanguim, Allergie, Nss, Scolaire, Professionnelle, Qprofessionnelle, ActiProAntet, ServiceNational, IdA], (err, result) => {
-                if (err){
-                 reject(err);}
-                 else{
-                resolve(result);}
-            });
+    
+     
+      static updateAgent(agentId, agentData, callback) {
+        db.query('UPDATE agent SET ? WHERE IdA = ', [agentData, agentId], (error, results) => {
+            if (error) {
+                callback(error);
+            } else {
+                callback(null);
+            }
         });
+    
+    }
+    static addPoste(agentId, posteData, callback) {
+      db.query('INSERT INTO postes (IdA,Poste, DateD, DateF,RisqueProfess,Motifs) VALUES (?,?, ?, ?,?,?)', [ agentId,posteData.Poste, posteData.DateD, posteData.DateF,posteData.RisqueProfess,posteData.Motifs], (error, results) => {
+          if (error) {
+              callback(error);
+          } else {
+              callback(null);
+          }
+      });
     }
 
+    static suppAgent(agentId, callback) {
+        db.beginTransaction((error) => {
+          if (error) {
+            console.error("Erreur lors du démarrage de la transaction :", error);
+            callback(error);
+            return;
+          }
+    
+          // Supprimer les postes associés à l'agent
+          db.query('DELETE FROM postes WHERE IdA = ?', [agentId], (error, result) => {
+            if (error) {
+              return db.rollback(() => {
+                console.error("Erreur lors de la suppression des postes de l'agent :", error);
+                callback(error);
+              });
+            }
+    
+            
+            db.query('DELETE FROM agent WHERE IdA = ?', [agentId], (error, result) => {
+              if (error) {
+                return db.rollback(() => {
+                  console.error("Erreur lors de la suppression de l'agent :", error);
+                  callback(error);
+                });
+              }
+    
+              db.commit((error) => {
+                if (error) {
+                  console.error("Erreur lors de la validation de la transaction :", error);
+                  return db.rollback(() => {
+                    callback(error);
+                  });
+                }
+    
+                callback(null);
+              });
+            });
+          });
+        });
+      }
 }
 export default AgentModule ;

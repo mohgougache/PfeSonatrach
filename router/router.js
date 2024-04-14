@@ -8,6 +8,6 @@ router.post("/api/login", controll.verficontrol);
 router.post("/api/ajouter", controlA.insertAgentWithPostes);
 router.get("/api/agentall", controlA.selctALLagent);
 router.get("/api/agent", controlA.selctagent);
-router.delete("/api/supagent", controlA.supAgent)
-router.put("/api/modifagent/:IdA", controlA.modifAgent);
+router.delete("/api/supagent/:IdA", controlA.deleteAgent)
+router.put("/api/modifagent", controlA.updateAgentAddPoste);
 export default router;
