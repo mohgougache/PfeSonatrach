@@ -127,5 +127,31 @@ class AgentControl{
           res.status(500).json({ error: "Erreur interne lors de l'envoi de l'e-mail" });
         }
       }
+      static async selcectRdv(req,res){
+        const IdA= req.params.IdA;
+        const Date= req.body.Date
+        let results = await agent.getRendevous(Date);
+        if(results){
+            res.json(results);
+           console.log(results);
+        }
+        else {
+            res.status(401).json({ error: "il ya problame dans la requit" });
+          
+        }
+       }
+       static async deleteRdv(req,res){
+        const IdR= req.params.IdR;
+        let result = await agent.supRdv(IdR);
+        if(result){
+            res.json(result);
+           console.log(result);
+        }
+        else {
+            res.status(401).json({ error: "il ya problame dans la requit"})
+        }
+    
+    } 
+
 }
   export default  AgentControl;

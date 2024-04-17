@@ -184,7 +184,32 @@ db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) V
             });
         });
     }
-    
+    static getRendevous(IdA,Date){
+    return new Promise(resolve =>{
+      db.query("SELECT * FROM rdv WHERE Date = ?" ,[IdA,Date],(error,result)=>{
+          if(!error){
+              resolve(result)
+          }
+          if(error){
+              console.log(error);
+               resolve(error);
+          }
+      })
+   })
+  }
+    static  supRdv(IdR){
+      return new Promise(resolve =>{
+        db.query("DELETE FROM rdv WHERE IdR = ? " ,[IdR],(error,result)=>{
+          if(!error){
+              resolve(result)
+          }
+          if(error){
+              console.log(error);
+               resolve(error);
+          }
+      })
+      })
+    }
     
 }
 
