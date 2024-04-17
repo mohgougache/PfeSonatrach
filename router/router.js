@@ -13,4 +13,5 @@ router.put("/api/modifagent", controlA.updateAgentAddPoste);
 router.post("/api/email", controlA.envoyerEmailEtInsert); 
 router.get("/api/selctRdv",controlA.selcectRdv);
 router.delete("/api/suprdv/:IdR", controlA.deleteRdv);
+router.put("/api/modifRdv", controlA.updateRdv);
 export default router;

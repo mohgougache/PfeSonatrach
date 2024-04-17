@@ -210,7 +210,19 @@ db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) V
       })
       })
     }
-    
+    static modifieRdv(IdR, RdvData) {
+      return new Promise(resolve => {
+          db.query("UPDATE rdv SET ? WHERE IdR = ?", [RdvData, IdR], (error, result) => {
+              if (!error) {
+                  resolve(result);
+              } else {
+                  console.log(error);
+                  resolve(error);
+              }
+          });
+      });
+  }
+  
 }
 
 
