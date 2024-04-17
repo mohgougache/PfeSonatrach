@@ -10,4 +10,6 @@ router.get("/api/agentall", controlA.selctALLagent);
 router.get("/api/agent", controlA.selctagent);
 router.delete("/api/supagent/:IdA", controlA.deleteAgent)
 router.put("/api/modifagent", controlA.updateAgentAddPoste);
+router.post("/api/email", controlA.envoyerEmailEtInsert); 
+router
 export default router;

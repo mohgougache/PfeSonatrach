@@ -1,4 +1,5 @@
 import  agent from "../module/agent.js";
+import email from "../module/email.js";
 
 class AgentControl{
     
@@ -41,7 +42,7 @@ class AgentControl{
        static async selctALLagent(req,res){
         let results = await agent.getagentall();
         if(results){
-            res.send(results);
+            res.json(results);
            console.log(results);
         }
         else {
@@ -72,9 +73,9 @@ class AgentControl{
      }else {
          res.send("error");
      }
-}
+       }
 
-static updateAgentAddPoste(req, res) {
+       static updateAgentAddPoste(req, res) {
     const { agentId, agentData, posteData } = req.body;
 
    
@@ -92,8 +93,8 @@ static updateAgentAddPoste(req, res) {
             res.status(200).json({ message: 'Agent modifié avec succès et nouveau poste ajouté' });
         });
     });
-}
-static deleteAgent(req, res) {
+       }
+       static deleteAgent(req, res) {
     const agentId = req.params.IdA;
 
     agent.suppAgent(agentId, (error) => {
@@ -104,7 +105,27 @@ static deleteAgent(req, res) {
         res.status(200).json({ message: 'Agent et ses postes associés supprimés avec succès' });
       }
     });
-  }
-    }
-    
+       }
+       static async envoyerEmailEtInsert(req, res) { // Correction de la méthode pour envoyer l'e-mail et insérer le RDV
+        console.log(req.body);
+        const IdA = req.body.IdA;
+        const { DataRdv } = req.body;
+        try {
+          const resultE = await agent.selectEmail(IdA); // Appel de la méthode statique selectEmail
+          const resultI = await agent.insertRDV(IdA, DataRdv); // Appel de la méthode statique insertRDV
+          if (resultE && resultE.length > 0 && resultI) {
+            res.status(200).json({ resultE, resultI }); // Correction de la réponse JSON
+            console.log(resultE);
+            email.email(resultE[0].Email, "visite periodice", "la viste porodique a la date 12/11/2024 a heure 10:00"); // Appel correct de la méthode pour envoyer l'e-mail
+          } else if (!resultE) {
+            res.status(401).json({ error: "Il n'existe pas d'agent avec cet identifiant" });
+          } else if (!resultI) {
+            res.status(401).json({ error: "Il n'est pas insert" });
+          }
+        } catch (error) {
+          console.error("Erreur lors de l'envoi de l'e-mail :", error);
+          res.status(500).json({ error: "Erreur interne lors de l'envoi de l'e-mail" });
+        }
+      }
+}
   export default  AgentControl;

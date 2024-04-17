@@ -1,0 +1,140 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Verification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      a {
+        color: #365cce;
+        text-decoration: none;
+      }
+      .border {
+        border-style: solid;
+        border-width: 1px;
+        border-color: #365cce;
+        border-radius: 0.25rem;
+      }
+      .otpbox {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        font-size: 12px;
+        font-weight: bold;
+        color: #365cce;
+      }
+      .footertext {
+        font-size: 12px;
+      }
+      @media (min-width: 640px) {
+        .footertext {
+          font-size: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        margin-top: 1.25rem;
+        font-family: Nunito, sans-serif;
+      "
+    >
+      <section style="max-width: 42rem; background-color: #fff">
+        <div
+          style="
+            height: 100px;
+            width: 100%;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+          "
+        >
+          <img src="./logo_sonatrach.svg" alt="" style="border-radius: 10px" />
+        </div>
+        <main
+          style="
+            margin-top: 2rem;
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+          "
+        >
+          <h4 style="color: #374151">Cher/Chère [Nom]</h4>
+          <p style="line-height: 1.5; color: #4b5563">
+            Vous êtes cordialement invité(e) à un rendez-vous médical pour [type
+            de rendez-vous]. Si l'heure vous convient, je souhaiterais vous
+            rencontrer à [heure] le [date] . Merci de votre coopération.
+          </p>
+
+          <p style="margin-top: 2rem; color: #4b5563">Cordialement,</p>
+        </main>
+       
+        <footer style="margin-top: 2rem">
+          <div
+            style="
+              background-color: rgba(209, 213, 219, 0.6);
+              height: 200px;
+              display: flex;
+              flex-direction: column;
+              gap: 1.25rem;
+              justify-content: center;
+              align-items: center;
+            "
+          >
+            <div
+              style="
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+              "
+            >
+              <h1
+                style="
+                  color: #f97316;
+                  font-weight: bold;
+                  font-size: 20px;
+                  letter-spacing: 2px;
+                "
+              >
+                Infirmière Sonatrach Divistion Laboratoire Boumerdes
+              </h1>
+              <p></p>
+              <a style="color: black"> Infirmière@mail.com </a>
+            </div>
+            <div
+              style=" 
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.75rem;
+              "
+            ></div>
+          </div>
+          <div
+            style="
+              background-color: #f97316;
+              padding-top: 10px;
+              padding-bottom: 10px;
+              color: #fff;
+              text-align: center;
+            "
+          >
+            <p class="footertext">© 2024 Développé par Groupe DGL</p>
+          </div>
+        </footer>
+      </section>
+    </div>
+  </body>
+</html>

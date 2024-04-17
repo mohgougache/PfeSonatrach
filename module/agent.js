@@ -1,11 +1,13 @@
-import db from "../baseDonne/connection.js"
+// import { type } from "express/lib/response.js";
+import db from "../baseDonne/connection.js";
 class AgentModule{
     static insertAgent(agentData, callback) {
-        db.query("INSERT INTO `agent`(Division, Direction, Unite, Service, Atelier, Nom, Prenom, DateN, LieuN, Sex, SitutionFamille, Adreese, GroupeSanguim, Allergie, Nss, Scolaire, Professionnelle, Qprofessionnelle, ActiProAntet, ServiceNational) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [agentData.Division, agentData.Direction, agentData.Unite, agentData.Service, agentData.Atelier, agentData.Nom, agentData.Prenom, agentData.DateN, agentData.LieuN, agentData.Sex, agentData.SitutionFamille, agentData.Adreese, agentData.GroupeSanguim, agentData.Allergie, agentData.Nss, agentData.Scolaire, agentData.Professionnelle, agentData.Qprofessionnelle, agentData.ActiProAntet, agentData.ServiceNational], (error, agentResult) => {
+        db.query("INSERT INTO `agent`(Division, Direction, Unite, Service, Atelier, Nom, Prenom, DateN, LieuN, Sex, Email,SitutionFamille, Adreese, GroupeSanguim, Allergie, Nss, Scolaire, Professionnelle, Qprofessionnelle, ActiProAntet, ServiceNational) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [agentData.Division, agentData.Direction, agentData.Unite, agentData.Service, agentData.Atelier, agentData.Nom, agentData.Prenom, agentData.DateN, agentData.LieuN, agentData.Sex, agentData.Email,agentData.SitutionFamille, agentData.Adreese, agentData.GroupeSanguim, agentData.Allergie, agentData.Nss, agentData.Scolaire, agentData.Professionnelle, agentData.Qprofessionnelle, agentData.ActiProAntet, agentData.ServiceNational], (error, agentResult) => {
             if (error) {
                 console.error("Erreur lors de l'insertion de l'agent :", error);
                 callback(error, null);
             } else {
+
                 callback(null, agentResult.insertId);
             }
         });
@@ -28,7 +30,7 @@ db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) V
     static async getagentall()
     {
      return new Promise(resolve =>{
-        db.query("SELECT Nom, Prenom, Sex, DateN, Nss FROM agent  " ,[],(error,result)=>{
+        db.query("SELECT IdA Nom, Prenom, Sex, DateN, Nss FROM agent  " ,[],(error,result)=>{
             if(!error){
                 resolve(result)
             }
@@ -120,5 +122,71 @@ db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) V
           });
         });
       }
+      // static EnvouyEmailSelcte(IdV,Date,heure,typeV){
+      //   if(type==1){
+      //     const sql = "SELECT * FROM destinataires WHERE DATE_ADD(dernier_envoi, INTERVAL 6 MONTH) = DATE_ADD(NOW(), INTERVAL 3 DAY)";
+      
+      // db.query(sql, (err, results) => {
+      //     if (err) {
+      //         console.error('Erreur lors de la récupération des destinataires :', err);
+      //         return;
+      //     }
+      //   });
+      // }
+      //   else if(type==2){
+          
+      //       const sql = "SELECT * FROM destinataires WHERE DATE_ADD(dernier_envoi, INTERVAL 3 MONTH) = DATE_ADD(NOW(), INTERVAL 3 DAY)";
+        
+      //   db.query(sql, (err, results) => {
+      //       if (err) {
+      //           console.error('Erreur lors de la récupération des destinataires :', err);
+      //           return;
+      //       }
+      //     });
+      //   }
+      //   else if(type==3){
+      //       const sql = "SELECT * FROM destinataires WHERE DATE_ADD(dernier_envoi, INTERVAL 1 ANNES) = DATE_ADD(NOW(), INTERVAL 3 DAY)";
+        
+      //   db.query(sql, (err, results) => {
+      //       if (err) {
+      //           console.error('Erreur lors de la récupération des destinataires :', err);
+      //           return;
+      //       }
+      //     });
+      //   }
+
+      // }
+      static selectEmail(IdA) {
+        return new Promise((resolve, reject) => {
+          db.query('SELECT Email FROM agent WHERE IdA = ?', [IdA], (error, result) => {
+            if (error) {
+              console.log("jjj"); 
+              console.error(error);
+              reject(error); // Rejeter la promesse en cas d'erreur
+            } else {
+              resolve(result); // Résoudre la promesse avec le résultat
+            }
+          });
+        });
+      }
+
+      static insertRDV(IdA, DataRdv) { 
+        return new Promise((resolve, reject) => { 
+            const query = 'INSERT INTO RDV (IdA, Type, Date, Heure) VALUES (?, ?, ?, ?)';
+            db.query(query, [IdA, DataRdv.Type, DataRdv.Date, DataRdv.Heure], (error, result) => {
+                if (error) {
+                    console.error("Erreur lors de l'insertion du RDV :", error);
+                    reject(error);
+                } else {
+                    console.log("Rendez-vous inséré avec succès :", result);
+                    resolve(result);
+                }
+            });
+        });
+    }
+    
+    
 }
+
+
 export default AgentModule ;
