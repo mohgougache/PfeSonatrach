@@ -60,27 +60,41 @@ db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) V
       
           });
     }
-    
-     
-      static updateAgent(agentId, agentData, callback) {
-        db.query('UPDATE agent SET ? WHERE IdA = ', [agentData, agentId], (error, results) => {
-            if (error) {
-                callback(error);
-            } else {
-                callback(null);
+    static async getAgent(IdA)
+    {
+     return new Promise(resolve =>{
+        db.query("SELECT IdA,Nom, Prenom,Email FROM agent  " ,[],(error,result)=>{
+            if(!error){
+                resolve(result)
             }
-        });
-    
+            if(error){
+                console.log(error);
+                 resolve(error);
+            }
+        })
+     })
     }
-    static addPoste(agentId, posteData, callback) {
-      db.query('INSERT INTO postes (IdA,Poste, DateD, DateF,RisqueProfess,Motifs) VALUES (?,?, ?, ?,?,?)', [ agentId,posteData.Poste, posteData.DateD, posteData.DateF,posteData.RisqueProfess,posteData.Motifs], (error, results) => {
+    
+    static updateAgentAndPoste(agentId, agentData, posteData, callback) {
+      // Mettre à jour l'agent
+      db.query('UPDATE agent SET ? WHERE IdA = ?', [agentData, agentId], (error) => {
           if (error) {
               callback(error);
-          } else {
-              callback(null);
+              return;
           }
+  
+          
+          db.query('INSERT INTO postes (IdA, Poste, DateD, DateF, RisqueProfess, Motifs) VALUES (?, ?, ?, ?, ?, ?)', [agentId, posteData.Poste, posteData.DateD, posteData.DateF, posteData.RisqueProfess, posteData.Motifs], (error) => {
+              if (error) {
+                  callback(error);
+                  return;
+              }
+  
+              callback(null);
+          });
       });
-    }
+  }
+  
 
     static suppAgent(agentId, callback) {
         db.beginTransaction((error) => {
@@ -183,9 +197,9 @@ db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) V
             });
         });
     }
-    static getRendevous(IdA,Date){
+    static getRendevous(Date){
     return new Promise(resolve =>{
-      db.query("SELECT * FROM rdv WHERE Date = ?" ,[IdA,Date],(error,result)=>{
+      db.query("SELECT agent.Nom, agent.Prenom, agent.Email, rdv.Heure, rdv.Type FROM agent JOIN rdv ON agent.IdA = rdv.IdA WHERE rdv.Date = ?" ,[Date],(error,result)=>{
           if(!error){
               resolve(result)
           }

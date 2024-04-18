@@ -64,6 +64,18 @@ class AgentControl{
           
         }
        }
+       static async selctAgent(req,res){
+        
+        let results = await agent.getAgent();
+        if(results){
+            res.status(200).json(results);
+            console.log(results);
+        }
+        else {
+            res.status(401).json({ error: "il ya problame dans la requit" });
+          
+        }
+       }
        
        static async supAgent(req,res){
             const idA=req.body.IdA;
@@ -76,24 +88,17 @@ class AgentControl{
        }
 
        static updateAgentAddPoste(req, res) {
-    const { agentId, agentData, posteData } = req.body;
-
-   
-    agent.updateAgent(agentId, agentData, (error) => {
-        if (error) {
-            return res.status(500).json({ error: "Erreur lors de la modification de l'agent" });
-        }
-
-        // Insérer un nouveau poste pour l'agent
-        agent.addPoste(agentId, posteData, (error) => {
+        const { agentId, agentData, posteData } = req.body;
+    
+        agent.updateAgentAndPoste(agentId, agentData, posteData, (error) => {
             if (error) {
-                return res.status(500).json({ error: "Erreur lors de l'ajout du poste" });
+                return res.status(500).json({ error: "Erreur lors de la mise à jour de l'agent et de l'ajout du poste" });
             }
-
+    
             res.status(200).json({ message: 'Agent modifié avec succès et nouveau poste ajouté' });
         });
-    });
-       }
+    }
+    
        static deleteAgent(req, res) {
     const agentId = req.params.IdA;
 

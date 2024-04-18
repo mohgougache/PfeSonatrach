@@ -20,5 +20,5 @@ app.use((req, res, next) => {
 // email.email("deboubmerzak@gmail.com","Convocation rdv","./mail.html");
 
 app.listen(3002, () => { 
-  console.log(`Serveur prêt sur le port 3005`);  
+  console.log(`Serveur prêt sur le port 3002`);   
 }); 
