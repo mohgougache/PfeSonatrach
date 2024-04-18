@@ -159,8 +159,7 @@ db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) V
       static selectEmail(IdA) {
         return new Promise((resolve, reject) => {
           db.query('SELECT Email FROM agent WHERE IdA = ?', [IdA], (error, result) => {
-            if (error) {
-              console.log("jjj"); 
+            if (error) { 
               console.error(error);
               reject(error); // Rejeter la promesse en cas d'erreur
             } else {

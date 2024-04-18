@@ -106,7 +106,7 @@ class AgentControl{
       }
     });
        }
-       static async envoyerEmailEtInsert(req, res) { // Correction de la méthode pour envoyer l'e-mail et insérer le RDV
+       static async envoyerEmailEtInsert(req, res) { 
         console.log(req.body);
         const IdA = req.body.IdA;
         const { DataRdv } = req.body;
@@ -116,7 +116,7 @@ class AgentControl{
           if (resultE && resultE.length > 0 && resultI) {
             res.status(200).json({ resultE, resultI }); // Correction de la réponse JSON
             console.log(resultE);
-            email.email(resultE[0].Email, "visite periodice", "la viste porodique a la date 12/11/2024 a heure 10:00"); // Appel correct de la méthode pour envoyer l'e-mail
+            email.email(resultE[0].Email, "visite periodice", "control/mail.html"); // Appel correct de la méthode pour envoyer l'e-mail
           } else if (!resultE) {
             res.status(401).json({ error: "Il n'existe pas d'agent avec cet identifiant" });
           } else if (!resultI) {
