@@ -157,9 +157,8 @@ class AgentControl{
     
     } 
     static async updateRdv(req, res) {
-        const IdR = req.body.IdR;
-        const RdvData = req.body.RdvData; 
-        let results = await agent.modifieRdv(IdR, RdvData); // Appel correct de la méthode modifieRdv
+        const RdvData = req.body.RdvData;  
+        let results = await agent.modifieRdv(RdvData); // Appel correct de la méthode modifieRdv
         if (results) {
             res.json(results);
             console.log(results);

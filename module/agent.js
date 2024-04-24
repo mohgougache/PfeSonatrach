@@ -223,18 +223,19 @@ db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) V
       })
       })
     }
-    static modifieRdv(IdR, RdvData) {
-      return new Promise(resolve => {
-          db.query("UPDATE rdv SET ? WHERE IdR = ?", [RdvData, IdR], (error, result) => {
-              if (!error) {
-                  resolve(result);
+    static modifieRdv(RdvData) {
+      return new Promise((resolve, reject) => {
+          db.query("UPDATE rdv SET ? WHERE IdR = ?", [RdvData, RdvData.IdR], (error, result) => {
+              if (error) {
+                  console.error("Erreur lors de la mise à jour du rendez-vous :", error);
+                  reject(error);
               } else {
-                  console.log(error);
-                  resolve(error);
+                  resolve(result);  
               }
           });
       });
   }
+  
   
 }
 
