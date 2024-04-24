@@ -197,19 +197,19 @@ db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) V
             });
         });
     }
-      static getRendevous(Date){
-    return new Promise(resolve =>{
-      db.query("SELECT agent.Nom, agent.Prenom, agent.Email, rdv.Heure, rdv.Type FROM agent JOIN rdv ON agent.IdA = rdv.IdA WHERE rdv.Date = ?" ,[Date],(error,result)=>{
-          if(!error){
-              resolve(result)
-          }
-          if(error){
-              console.log(error);
-               resolve(error);
-          }
-      })
-   })
+    static getRendevous(Date) {
+      return new Promise(resolve => {
+          db.query("SELECT rdv.IdA,agent.Nom, agent.Prenom, agent.Email, rdv.Heure, rdv.TypeRdv FROM agent JOIN rdv ON agent.IdA = rdv.IdA WHERE rdv.Date = ?", [Date], (error, result) => {
+              if (!error) {
+                  resolve(result);
+              } else {
+                  console.log(error);
+                  resolve(error);
+              }
+          });
+      });
   }
+  
     static  supRdv(IdR){
       return new Promise(resolve =>{
         db.query("DELETE FROM rdv WHERE IdR = ? " ,[IdR],(error,result)=>{

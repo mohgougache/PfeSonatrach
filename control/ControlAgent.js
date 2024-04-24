@@ -113,7 +113,7 @@ class AgentControl{
        }
        static async envoyerEmailEtInsert(req, res) { 
         console.log(req.body);
-        const { Data } = req.body;
+        const { ...Data } = req.body;
         try {
           const resultE = await agent.selectEmail(Data.IdA); // Appel de la méthode statique selectEmail
           const resultI = await agent.insertRDV(Data); // Appel de la méthode statique insertRDV
@@ -124,7 +124,7 @@ class AgentControl{
           } else if (!resultE) {
             res.status(401).json({ error: "Il n'existe pas d'agent avec cet identifiant" });
           } else if (!resultI) {
-            res.status(401).json({ error: "Il n'est pas insert" });
+            res.status(401).json({ error: "Il n'est pas insert" }); 
           }
         } catch (error) {
           console.error("Erreur lors de l'envoi de l'e-mail :", error);
@@ -132,7 +132,7 @@ class AgentControl{
         }
       }
       static async selcectRdv(req,res){
-        const IdA= req.params.IdA;
+        // const IdA= req.params.IdA;
         const Date= req.body.Date
         let results = await agent.getRendevous(Date);
         if(results){
