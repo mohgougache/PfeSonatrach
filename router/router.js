@@ -15,5 +15,5 @@ router.post("/api/convocation", controlA.envoyerEmailEtInsert);
 router.get("/api/selctRdv",controlA.selcectRdv);
 router.delete("/api/suprdv/:IdR", controlA.deleteRdv);
 router.put("/api/modifRdv", controlA.updateRdv);
-router.post("/api/envemail", controlA.envoyerEmailEtInsert);
+// router.post("/api/envemail", controlA.envoyerEmailEtInsert);
 export default router;

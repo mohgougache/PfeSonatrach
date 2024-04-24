@@ -3,7 +3,7 @@ import email from "../module/email.js";
 
 class AgentControl{
     
-    static async insertAgentWithPostes(req, res) {
+       static async insertAgentWithPostes(req, res) {
         try {
             const agentData = req.body;
             const postesData = req.body.postes;
@@ -36,9 +36,8 @@ class AgentControl{
         } catch (error) {
             res.status(500).json({ error });
         }
-    }
-    
-    
+       }
+
        static async selctALLagent(req,res){
         let results = await agent.getagentall();
         if(results){
@@ -64,6 +63,7 @@ class AgentControl{
           
         }
        }
+
        static async selctAgent2(req,res){
         
         let results = await agent.getAgent();
@@ -77,15 +77,15 @@ class AgentControl{
         }
        }
        
-       static async supAgent(req,res){
-            const idA=req.body.IdA;
-        var x= await agent.delltAgent(idA);
-        if(x==true){
-         res.send("seuccessfully")
-     }else {
-         res.send("error");
-     }
-       }
+    //    static async supAgent(req,res){
+    //         const idA=req.body.IdA;
+    //     var x= await agent.delltAgent(idA);
+    //     if(x==true){
+    //      res.send("seuccessfully")
+    //  }else {
+    //      res.send("error");
+    //  }
+    //    }
 
        static updateAgentAddPoste(req, res) {
         const { agentId, agentData, posteData } = req.body;
@@ -97,7 +97,7 @@ class AgentControl{
     
             res.status(200).json({ message: 'Agent modifié avec succès et nouveau poste ajouté' });
         });
-    }
+       }
     
        static deleteAgent(req, res) {
     const agentId = req.params.IdA;
@@ -113,11 +113,10 @@ class AgentControl{
        }
        static async envoyerEmailEtInsert(req, res) { 
         console.log(req.body);
-        const IdA = req.body.IdA;
-        const { DataRdv } = req.body;
+        const { Data } = req.body;
         try {
-          const resultE = await agent.selectEmail(IdA); // Appel de la méthode statique selectEmail
-          const resultI = await agent.insertRDV(IdA, DataRdv); // Appel de la méthode statique insertRDV
+          const resultE = await agent.selectEmail(Data.IdA); // Appel de la méthode statique selectEmail
+          const resultI = await agent.insertRDV(Data); // Appel de la méthode statique insertRDV
           if (resultE && resultE.length > 0 && resultI) {
             res.status(200).json({ resultE, resultI }); // Correction de la réponse JSON
             console.log(resultE);
@@ -145,7 +144,7 @@ class AgentControl{
           
         }
        }
-       static async deleteRdv(req,res){
+      static async deleteRdv(req,res){
         const IdR= req.params.IdR;
         let result = await agent.supRdv(IdR);
         if(result){

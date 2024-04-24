@@ -181,12 +181,12 @@ db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) V
             }
           });
         });
-      }
+      } 
 
-      static insertRDV(IdA, DataRdv) { 
+      static insertRDV(Data) { 
         return new Promise((resolve, reject) => { 
-            const query = 'INSERT INTO RDV (IdA, Type, Date, Heure) VALUES (?, ?, ?, ?)';
-            db.query(query, [IdA, DataRdv.Type, DataRdv.Date, DataRdv.Heure], (error, result) => {
+            const query = 'INSERT INTO RDV (IdA, TypeRdv, Date, Heure) VALUES (?, ?, ?, ?)';
+            db.query(query, [Data.IdA, Data.TypeRdv, Data.Date, Data.Heure], (error, result) => {
                 if (error) {
                     console.error("Erreur lors de l'insertion du RDV :", error);
                     reject(error);
@@ -197,7 +197,7 @@ db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) V
             });
         });
     }
-    static getRendevous(Date){
+      static getRendevous(Date){
     return new Promise(resolve =>{
       db.query("SELECT agent.Nom, agent.Prenom, agent.Email, rdv.Heure, rdv.Type FROM agent JOIN rdv ON agent.IdA = rdv.IdA WHERE rdv.Date = ?" ,[Date],(error,result)=>{
           if(!error){
