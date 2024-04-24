@@ -64,7 +64,7 @@ class AgentControl{
           
         }
        }
-       static async selctAgent(req,res){
+       static async selctAgent2(req,res){
         
         let results = await agent.getAgent();
         if(results){

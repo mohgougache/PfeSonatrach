@@ -8,7 +8,7 @@ router.post("/api/login", controll.verficontrol);
 router.post("/api/ajouter", controlA.insertAgentWithPostes);
 router.get("/api/agentall", controlA.selctALLagent);
 router.get("/api/agent1", controlA.selctagent);
-router.get("/api/agent2", controlA.selctAgent);
+router.get("/api/agent2", controlA.selctAgent2);
 router.delete("/api/supagent/:IdA", controlA.deleteAgent);
 router.put("/api/modifagent", controlA.updateAgentAddPoste);
 router.post("/api/convocation", controlA.envoyerEmailEtInsert); 

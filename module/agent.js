@@ -60,13 +60,13 @@ db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) V
       
           });
     }
-    static async getAgent(IdA)
+    static async getAgent()
     {
      return new Promise(resolve =>{
         db.query("SELECT IdA,Nom, Prenom,Email FROM agent  " ,[],(error,result)=>{
             if(!error){
                 resolve(result)
-            }
+            } 
             if(error){
                 console.log(error);
                  resolve(error);
