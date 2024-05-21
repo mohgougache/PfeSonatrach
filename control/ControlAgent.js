@@ -3,41 +3,6 @@ import email from "../module/email.js";
 
 class AgentControl{
     
-       static async insertAgentWithPostes(req, res) {
-        try {
-            const agentData = req.body;
-            const postesData = req.body.postes;
-    
-            // Insérer l'agent
-            const agentId = await new Promise((resolve, reject) => {
-                agent.insertAgent(agentData, (error, agentId) => {
-                    if (error) {
-                        console.error("Erreur lors de l'insertion de l'agent :", error);
-                        reject("Erreur lors de l'insertion de l'agent");
-                    } else {
-                        resolve(agentId);
-                    }
-                });
-            });
-    
-            const postesWithAgentId = postesData.map(poste => ({ ...poste, IdA: agentId }));
-            await new Promise((resolve, reject) => {
-                agent.insertPostes(postesWithAgentId, (error) => {
-                    if (error) {
-                        console.error("Erreur lors de l'insertion des postes :", error);
-                        reject("Erreur lors de l'insertion des postes");
-                    } else {
-                        resolve();
-                    }
-                });
-            });
-    
-            res.status(201).json({ message: 'Agent inséré avec succès avec ses postes associés' });
-        } catch (error) {
-            res.status(500).json({ error });
-        }
-       }
-
        static async selctALLagent(req,res){
         let results = await agent.getagentall();
         if(results){
@@ -76,41 +41,56 @@ class AgentControl{
           
         }
        }
-       
-    //    static async supAgent(req,res){
-    //         const idA=req.body.IdA;
-    //     var x= await agent.delltAgent(idA);
-    //     if(x==true){
-    //      res.send("seuccessfully")
-    //  }else {
-    //      res.send("error");
-    //  }
-    //    }
-
-       static updateAgentAddPoste(req, res) {
-        const { agentId, agentData, posteData } = req.body;
     
-        agent.updateAgentAndPoste(agentId, agentData, posteData, (error) => {
-            if (error) {
-                return res.status(500).json({ error: "Erreur lors de la mise à jour de l'agent et de l'ajout du poste" });
+    static async InsertAgentAndPoste(req, res) {
+        const { agentData, posteData } = req.body;
+        try {
+            const result = await agent.InsertAgentAndPoste(agentData, posteData);
+            if(result){
+                res.status(200).json({ message: 'Insert réussie de l\'agent et du poste', result });
+            } else{
+                res.status(401).json({ error: "erreur de Insert " });
             }
+        } catch (error) {
+            console.log( error);
+            res.status(500).json({ error: 'Erreur lors Insert de l\'agent et du poste', message: error.message });
+        }
+    }
+    static async updateAgentAndPoste(req, res) {
+        const { agentData, posteData } = req.body;
+        try {
+            const result = await agent.ModifieAgentAndPoste(agentData, posteData);
+            if(result){
+                res.status(200).json({ message: 'Updit réussie de l\'agent et du poste', result });
+            } else{
+                res.status(401).json({ error: "erreur de updit " });
+            }
+        } catch (error) {
+            console.log( error);
+            res.status(500).json({ error: 'Erreur lors updit de l\'agent et du poste', message: error.message });
+        }
+    }
     
-            res.status(200).json({ message: 'Agent modifié avec succès et nouveau poste ajouté' });
-        });
-       }
-    
-       static deleteAgent(req, res) {
-    const agentId = req.params.IdA;
+       static async deleteAgent(req, res) {
+        const IdA = req.params.IdA; // Supposons que l'ID de l'agent à supprimer est passé en paramètre d'URL
 
-    agent.suppAgent(agentId, (error) => {
-      if (error) {
-        console.error("Erreur lors de la suppression de l'agent et de ses postes :", error);
-        res.status(500).json({ error: "Erreur lors de la suppression de l'agent et de ses postes" });
-      } else {
-        res.status(200).json({ message: 'Agent et ses postes associés supprimés avec succès' });
-      }
-    });
-       }
+        try {
+            
+            const result = await agent.suppAgent(IdA);
+            if(result)
+           
+            res.status(200).json({ message: 'Agent supprimé avec succès' });
+            else {
+                res.status(401).json({ error: "erreur de supprime " });
+            }
+
+        } catch (error) {
+            console.error("Erreur lors de la suppression de l'agent :", error);
+            res.status(500).json({ error: "Erreur lors de la suppression de l'agent" });
+        }
+    }
+    
+       
        static async envoyerEmailEtInsert(req, res) { 
         console.log(req.body);
         const { ...Data } = req.body;
@@ -166,7 +146,30 @@ class AgentControl{
             res.status(401).json({ error: "Il y a un problème dans la requête" });
         }
     }
-    
+    static async InsertCertificat(req, res) {
+        const { TypeC, certificatData } = req.body;
+        try {
+            const result = await agent.AjouterCertificat(TypeC,certificatData);
+            if(result){
+                res.status(200).json({ message: 'Insert réussie de certificat ', result });
+            } else{
+                res.status(401).json({ error: "erreur de Insert " });
+            }
+        } catch (error) {
+            console.log( error);
+            res.status(500).json({ error: 'Erreur lors Insert certificat', message: error.message });
+        }
+    }
+    static async insererVisite(req, res) {
+        const {Vdata} = req.body;
+        try {
+          const result = await agent.insererVisite(Vdata);
+          res.status(200).json({ message: 'Données de visite insérées avec succès', result });
+        } catch (error) {
+          console.error('Erreur lors de l\'insertion des données de visite :', error);
+          res.status(500).json({ error: 'Erreur lors de l\'insertion des données de visite' });
+        }
+      } 
 
 }
   export default  AgentControl;

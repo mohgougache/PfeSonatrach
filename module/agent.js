@@ -1,36 +1,12 @@
 // import { type } from "express/lib/response.js";
 import db from "../baseDonne/connection.js";
 class AgentModule{
-    static insertAgent(agentData, callback) {
-        db.query("INSERT INTO `agent`(Division, Direction, Unite, Service, Atelier, Nom, Prenom, DateN, LieuN, Sex, Email,SitutionFamille, Adreese, GroupeSanguim, Allergie, Nss, Scolaire, Professionnelle, Qprofessionnelle, ActiProAntet, ServiceNational) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", [agentData.Division, agentData.Direction, agentData.Unite, agentData.Service, agentData.Atelier, agentData.Nom, agentData.Prenom, agentData.DateN, agentData.LieuN, agentData.Sex, agentData.Email,agentData.SitutionFamille, agentData.Adreese, agentData.GroupeSanguim, agentData.Allergie, agentData.Nss, agentData.Scolaire, agentData.Professionnelle, agentData.Qprofessionnelle, agentData.ActiProAntet, agentData.ServiceNational], (error, agentResult) => {
-            if (error) {
-                console.error("Erreur lors de l'insertion de l'agent :", error);
-                callback(error, null);
-            } else {
-
-                callback(null, agentResult.insertId);
-            }
-        });
-    }
     
-    static insertPostes(postesData, callback) {
-        const values = postesData.map(poste => [poste.Poste, poste.DateD, poste.DateF, poste.RisqueProfess, poste.Motifs, poste.IdA]);
-
-db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) VALUES ?', [values], (error, postesResult) => {
-    if (error) {
-        console.error("Erreur lors de l'insertion des postes :", error);
-        callback(error);
-    } else {
-        callback(null);
-    }
-});
-
-    }
     
     static async getagentall()
     {
      return new Promise(resolve =>{
-        db.query("SELECT IdA Nom, Prenom, Sex, DateN, Nss FROM agent  " ,[],(error,result)=>{
+        db.query("SELECT IdA ,Nom, Prenom, Sex, DateN, Nss FROM agent  " ,[],(error,result)=>{
             if(!error){
                 resolve(result)
             }
@@ -75,101 +51,136 @@ db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) V
      })
     }
     
-    static updateAgentAndPoste(agentId, agentData, posteData, callback) {
-      // Mettre à jour l'agent
-      db.query('UPDATE agent SET ? WHERE IdA = ?', [agentData, agentId], (error) => {
-          if (error) {
-              callback(error);
-              return;
-          }
+   
   
-          
-          db.query('INSERT INTO postes (IdA, Poste, DateD, DateF, RisqueProfess, Motifs) VALUES (?, ?, ?, ?, ?, ?)', [agentId, posteData.Poste, posteData.DateD, posteData.DateF, posteData.RisqueProfess, posteData.Motifs], (error) => {
-              if (error) {
-                  callback(error);
-                  return;
-              }
-  
-              callback(null);
-          });
-      });
-  }
-  
-
-    static suppAgent(agentId, callback) {
-        db.beginTransaction((error) => {
-          if (error) {
-            console.error("Erreur lors du démarrage de la transaction :", error);
-            callback(error);
-            return;
+    static  AjouterAgentAndPoste(agentData, posteData) {
+      return new Promise((resolve, reject) => {
+        db.beginTransaction((err) => {
+          if (err) {
+            reject(err);
           }
     
-          // Supprimer les postes associés à l'agent
-          db.query('DELETE FROM postes WHERE IdA = ?', [agentId], (error, result) => {
+          const agentInsertSql = 'INSERT INTO agent (`Division`, `Direction`, `Unite`, `Service`, `Atelier`, `Nom`, `Prenom`, `DateN`, `LieuN`, `Sex`, `Email`, `SitutionFamille`, `Adreese`, `GroupeSanguim`, `Allergie`, `Nss`, `Scolaire`, `Professionnelle`, `Qprofessionnelle`, `ActiProAntet`, `ServiceNational`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+          db.query(agentInsertSql, [agentData.Division, agentData.Direction, agentData.Unite, agentData.Service, agentData.Atelier, agentData.Nom, agentData.Prenom, agentData.DateN, agentData.LieuN, agentData.Sex, agentData.Email, agentData.SitutionFamille, agentData.Adreese, agentData.GroupeSanguim, agentData.Allergie, agentData.Nss, agentData.Scolaire, agentData.Professionnelle, agentData.Qprofessionnelle, agentData.ActiProAntet, agentData.ServiceNational], (error, agentResult) => {
             if (error) {
-              return db.rollback(() => {
-                console.error("Erreur lors de la suppression des postes de l'agent :", error);
-                callback(error);
+              return db.rollback(() => { 
+                reject(error);
               });
             }
     
-            
-            db.query('DELETE FROM agent WHERE IdA = ?', [agentId], (error, result) => {
+            const postInsertSql = 'INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) VALUES (?, ?,?,?,?,?)';
+            db.query(postInsertSql, [posteData.Poste, posteData.DateD,posteData.DateF,posteData.RisqueProfess,posteData.Motifs, agentResult.insertId], (error, postResult) => {
               if (error) {
                 return db.rollback(() => {
-                  console.error("Erreur lors de la suppression de l'agent :", error);
-                  callback(error);
+                  reject(error);
                 });
               }
     
+              // Si toutes les requêtes sont réussies, on commit la transaction
               db.commit((error) => {
                 if (error) {
-                  console.error("Erreur lors de la validation de la transaction :", error);
                   return db.rollback(() => {
-                    callback(error);
+                    reject(error);
                   });
                 }
-    
-                callback(null);
+                resolve({ agent: agentResult, post: postResult });
               });
             });
           });
         });
-      }
-      // static EnvouyEmailSelcte(IdV,Date,heure,typeV){
-      //   if(type==1){
-      //     const sql = "SELECT * FROM destinataires WHERE DATE_ADD(dernier_envoi, INTERVAL 6 MONTH) = DATE_ADD(NOW(), INTERVAL 3 DAY)";
-      
-      // db.query(sql, (err, results) => {
-      //     if (err) {
-      //         console.error('Erreur lors de la récupération des destinataires :', err);
-      //         return;
-      //     }
-      //   });
-      // }
-      //   else if(type==2){
-          
-      //       const sql = "SELECT * FROM destinataires WHERE DATE_ADD(dernier_envoi, INTERVAL 3 MONTH) = DATE_ADD(NOW(), INTERVAL 3 DAY)";
-        
-      //   db.query(sql, (err, results) => {
-      //       if (err) {
-      //           console.error('Erreur lors de la récupération des destinataires :', err);
-      //           return;
-      //       }
-      //     });
-      //   }
-      //   else if(type==3){
-      //       const sql = "SELECT * FROM destinataires WHERE DATE_ADD(dernier_envoi, INTERVAL 1 ANNES) = DATE_ADD(NOW(), INTERVAL 3 DAY)";
-        
-      //   db.query(sql, (err, results) => {
-      //       if (err) {
-      //           console.error('Erreur lors de la récupération des destinataires :', err);
-      //           return;
-      //       }
-      //     });
-      //   }
-
-      // }
+      });
+    }
+    static  ModifieAgentAndPoste(agentData, posteData) {
+      return new Promise((resolve, reject) => {
+        db.beginTransaction((err) => {
+          if (err) {
+            reject(err);
+          }
+    
+          const agentInsertSql = 'UPDATE agent SET ? WHERE IdA = ?';
+          db.query(agentInsertSql, [agentData,agentData.IdA], (error, agentResult) => {
+            if (error) {
+              return db.rollback(() => { 
+                reject(error);
+              });
+            }
+    
+            const postInsertSql = 'UPDATE postes SET ? WHERE IdA = ?';
+            db.query(postInsertSql, [posteData,agentData.IdA], (error, postResult) => {
+              if (error) {
+                return db.rollback(() => {
+                  reject(error);
+                });
+              }
+    
+              // Si toutes les requêtes sont réussies, on commit la transaction
+              db.commit((error) => {
+                if (error) {
+                  return db.rollback(() => {
+                    reject(error);
+                  });
+                }
+                resolve({ agent: agentResult, post: postResult });
+              });
+            });
+          });
+        });
+      });
+    }
+    
+    
+    static suppAgent(agentId) {
+      return new Promise((resolve, reject) => {
+          db.beginTransaction((error) => {
+              if (error) {
+                  console.error("Erreur lors du démarrage de la transaction :", error);
+                  reject(error);
+                  return;
+              }
+  
+              db.query('DELETE FROM postes WHERE IdA = ?', [agentId], (error, postesResult) => {
+                  if (error) {
+                      return db.rollback(() => {
+                          console.error("Erreur lors de la suppression des postes de l'agent :", error);
+                          reject(error);
+                      });
+                  }
+  
+                  db.query('DELETE FROM rdv WHERE IdA = ?', [agentId], (error, rdvResult) => {
+                      if (error) {
+                          return db.rollback(() => {
+                              console.error("Erreur lors de la suppression des rendez-vous de l'agent :", error);
+                              reject(error);
+                          });
+                      }
+  
+                      db.query('DELETE FROM agen WHERE IdA = ?', [agentId], (error, agentResult) => {
+                          if (error) {
+                              return db.rollback(() => {
+                                  console.error("Erreur lors de la suppression de l'agent :", error);
+                                  reject(error);
+                              });
+                          }
+  
+                          db.commit((error) => {
+                              if (error) {
+                                  console.error("Erreur lors de la validation de la transaction :", error);
+                                  return db.rollback(() => {
+                                      reject(error);
+                                  });
+                              }
+  
+                              resolve({ postes: postesResult, rdv: rdvResult, agent: agentResult });
+                          });
+                      });
+                  });
+              });
+          });
+      });
+  }
+  
+  
+     
       static selectEmail(IdA) {
         return new Promise((resolve, reject) => {
           db.query('SELECT Email FROM agent WHERE IdA = ?', [IdA], (error, result) => {
@@ -235,7 +246,19 @@ db.query('INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) V
           });
       });
   }
-  
+  static insererVisite(Vdata) {
+    return new Promise((resolve, reject) => {
+      db.query('INSERT INTO visite(`DateV`, `TypeV`, `idA`) VALUES (?, ?, ?)', [Vdata.DateV, Vdata.TypeV, Vdata.idA], (error, result) => {
+        if (error) {
+          console.error("Erreur lors de l'insertion des données de visite :", error);
+          reject(error);
+        } else {
+          console.log("Données de visite insérées avec succès :", result);
+          resolve(result);
+        }
+      });
+    });
+  } 
   
 }
 
