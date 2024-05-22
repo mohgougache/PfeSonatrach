@@ -170,6 +170,17 @@ class AgentControl{
           res.status(500).json({ error: 'Erreur lors de l\'insertion des données de visite' });
         }
       } 
+      static async deleteVisite(req, res) {
+        const IdV = req.params.id;
+
+        try {
+            await agent.supVisite(IdV);
+            res.send({ message: 'Visite supprimée avec succès' });
+        } catch (err) {
+            console.error('Erreur lors de la suppression de la visite:', err);
+            res.status(500).send('Erreur lors de la suppression de la visite');
+        }
+    }
 
 }
   export default  AgentControl;

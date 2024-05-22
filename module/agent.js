@@ -127,57 +127,81 @@ class AgentModule{
         });
       });
     }
-    
-    
-    static suppAgent(agentId) {
+    static getVisitesByAgentId(agentId) {
       return new Promise((resolve, reject) => {
-          db.beginTransaction((error) => {
-              if (error) {
-                  console.error("Erreur lors du démarrage de la transaction :", error);
-                  reject(error);
-                  return;
+          db.query('SELECT IdV FROM visite WHERE IdA = ?', [agentId], (err, results) => {
+              if (err) {
+                  return reject(err);
               }
-  
-              db.query('DELETE FROM postes WHERE IdA = ?', [agentId], (error, postesResult) => {
-                  if (error) {
-                      return db.rollback(() => {
-                          console.error("Erreur lors de la suppression des postes de l'agent :", error);
-                          reject(error);
-                      });
-                  }
-  
-                  db.query('DELETE FROM rdv WHERE IdA = ?', [agentId], (error, rdvResult) => {
-                      if (error) {
-                          return db.rollback(() => {
-                              console.error("Erreur lors de la suppression des rendez-vous de l'agent :", error);
-                              reject(error);
-                          });
-                      }
-  
-                      db.query('DELETE FROM agen WHERE IdA = ?', [agentId], (error, agentResult) => {
-                          if (error) {
-                              return db.rollback(() => {
-                                  console.error("Erreur lors de la suppression de l'agent :", error);
-                                  reject(error);
-                              });
-                          }
-  
-                          db.commit((error) => {
-                              if (error) {
-                                  console.error("Erreur lors de la validation de la transaction :", error);
-                                  return db.rollback(() => {
-                                      reject(error);
-                                  });
-                              }
-  
-                              resolve({ postes: postesResult, rdv: rdvResult, agent: agentResult });
-                          });
-                      });
-                  });
-              });
+              resolve(results);
           });
       });
   }
+    
+    static suppAgent(agentId) {
+      return new Promise((resolve, reject) => {
+        db.beginTransaction(async (err) => {
+            if (err) {
+                return reject(err);
+            }
+
+            try {
+                // Récupérer les visites associées à l'agent
+                const visites = await this.getVisitesByAgentId(agentId);
+
+                // Supprimer chaque visite associée à l'agent
+                for (let visite of visites) {
+                    await this.supVisite(visite.IdV);
+                }
+
+                // Supprimer les entrées dans 'postes' associées à l'agent
+                await new Promise((resolve, reject) => {
+                    db.query('DELETE FROM postes WHERE IdA = ?', [agentId], (err, result) => {
+                        if (err) {
+                            return reject(err);
+                        }
+                        resolve(result);
+                    });
+                });
+
+                // Supprimer les entrées dans 'rdv' associées à l'agent
+                await new Promise((resolve, reject) => {
+                    db.query('DELETE FROM rdv WHERE IdA = ?', [agentId], (err, result) => {
+                        if (err) {
+                            return reject(err);
+                        }
+                        resolve(result);
+                    });
+                });
+
+                // Supprimer l'agent
+                await new Promise((resolve, reject) => {
+                    db.query('DELETE FROM agent WHERE IdA = ?', [agentId], (err, result) => {
+                        if (err) {
+                            return reject(err);
+                        }
+                        resolve(result);
+                    });
+                });
+
+                db.commit((err) => {
+                    if (err) {
+                        return db.rollback(() => {
+                            reject(err);
+                        });
+                    }
+                    resolve();
+                });
+            } catch (error) {
+                return db.rollback(() => {
+                    reject(error);
+                });
+            }
+        });
+    });
+  }
+  
+  
   
   
      
@@ -259,7 +283,57 @@ class AgentModule{
       });
     });
   } 
-  
+  static supVisite(id) {
+    return new Promise((resolve, reject) => {
+        db.beginTransaction((err) => {
+            if (err) {
+                return reject(err);
+            }
+
+            const tables = [
+                'cadiovasculaire', 'respiratoire', 'neuropsychisme', 'opht', 'orl',
+                'peaumuqueuses', 'explorationsfonctionnelles', 'genitourinaire',
+                'hematogg', 'locomoteur', 'digestif', 'endocrino','exemenscomplementaires'
+            ];
+
+            let deleteFromTablePromises = tables.map((table) => {
+                return new Promise((resolve, reject) => {
+                    db.query(`DELETE FROM ${table} WHERE IdV = ?`, [id], (err, result) => {
+                        if (err) {
+                            return reject(err);
+                        }
+                        resolve(result);
+                    });
+                });
+            });
+
+            Promise.all(deleteFromTablePromises)
+                .then(() => {
+                    db.query('DELETE FROM visite WHERE IdV = ?', [id], (err, result) => {
+                        if (err) {
+                            return db.rollback(() => {
+                                reject(err);
+                            });
+                        }
+
+                        db.commit((err) => {
+                            if (err) {
+                                return db.rollback(() => {
+                                    reject(err);
+                                });
+                            }
+                            resolve(result);
+                        });
+                    });
+                })
+                .catch((err) => {
+                    db.rollback(() => {
+                        reject(err);
+                    });
+                });
+        });
+    });
+}
 }
 
 
