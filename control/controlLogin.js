@@ -86,8 +86,9 @@ static async verficontrol(req, res) {
   static async DeletProfil(req,res){
     const IdE= req.params.IdE;
         let result = await login.supProfil(IdE);
-        if(result){
-          res.status(200).json({ result: "bien supprime Profil"});
+        const profils = await login.getAllProfils();
+        if(result && profils){
+          res.status(200).json({ message: "bien supprime Profil",data: profils});
         }
         else {
             res.status(401).json({ error: "il ya problame dans la requit"})
