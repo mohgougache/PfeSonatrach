@@ -111,7 +111,20 @@ static supProfil(IdE){
                     console.error("Erreur lors de la récupération des profils :", error);
                     reject(error);
                 } else {
-                    resolve(results);
+                    resolve(results); 
+                }
+            });
+        });
+    }
+    
+    static getProfil(IdE) {
+        return new Promise((resolve, reject) => {
+            db.query('SELECT Nom,Prenom,Email FROM profil WHERE IdE = ?',[IdE], (error, results) => {
+                if (error) {
+                    console.error("Erreur lors de la récupération des profils :", error);
+                    reject(error);
+                } else {
+                    resolve(results); 
                 }
             });
         });
