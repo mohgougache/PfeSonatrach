@@ -6,7 +6,7 @@ import controlD from  "../control/controlDossie.js"
 
 const router = express.Router();
 router.post("/api/profil", controll.ajouterProfil);
-router.delete("/api/supProfil/:IdE", controll.DeletProfil);
+router.delete("/api/supProfil", controll.DeletProfil);
 router.post("/api/login", controll.verficontrol);
 router.post("/api/password", controll.updatePassword);
 router.get("/api/selProfil", controll.getProfils);
