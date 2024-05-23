@@ -42,14 +42,14 @@ class loginController {
             <td align="center" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:18px;color:#333333;font-size:12px">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; © Copyright 2024 Groupe DGL<a target="_blank" href="https://viewstripo.email" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#0081FF;font-size:12px"></a></p> </td></tr></table></td></tr></table></td></tr></table></td></tr></table> <table cellpadding="0" cellspacing="0" class="es-content" align="center" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%"><tr style="border-collapse:collapse">
             <td align="center" style="padding:0;Margin:0"><table class="es-content-body" align="center" cellpadding="0" cellspacing="0" bgcolor="transparent" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:transparent;width:600px" role="none"><tr style="border-collapse:collapse"><td align="left" bgcolor="#ffffff" style="padding:0;Margin:0;padding-top:40px;padding-bottom:40px;background-color:#ffffff"><table width="100%" cellspacing="0" cellpadding="0" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"><tr style="border-collapse:collapse"><td valign="top" align="center" style="padding:0;Margin:0;width:600px"><table width="100%" cellspacing="0" cellpadding="0" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px"><tr style="border-collapse:collapse">
             <td class="made_with" align="center" style="padding:0;Margin:0;font-size:0px"><img src="https://fhtkqeb.stripocdn.email/content/guids/CABINET_c9cb813ef0374adeb8fccd909f7735bbc43f88be82a4b22ebe1b98a37b54d6b9/images/dgl.png" alt="Made with" title="Made with" width="120" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;font-size:12px" height="120"></td> </tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></div></body></html>`;
-           
+            console.log(DataProfil.Email);
             await email.email(DataProfil.Email, "visite periodice", htmlContent);
             res.status(201).json({ success: true, message: 'Profil ajouté avec succès.', data: result });
         } catch (error) {
             res.status(500).json({ success: false, message: "Erreur lors de l'ajout du profil.", error: error.message });
             console.log(error);
         }
-    }
+    } 
 
 
 static async verficontrol(req, res) {
@@ -162,35 +162,22 @@ static async updatePassword(req, res) {
       res.status(500).json({ success: false, message: 'Erreur lors de la mise à jour du mot de passe.', error: error.message });
   }
 }
-static async chengeStatut(req, res) {
-  const IdE  = req.body.IdE;
-
-  if (!IdE) {
-      return res.status(400).json({ success: false, message: 'IdE est requis.' });
-  }
-
+static async changeStatut(req, res) {
+  const Data  = {...req.body};
   try {
-      const profil = await login.getAllProfils(IdE);
-      if (!profil) {
-          return res.status(404).json({ success: false, message: 'Profil non trouvé.' });
-      }
+    
+    
+  
+    const result = await login.updateStatut(Data.IdE,Data.Statut);
 
-      let newStatut;
-      if (profil.Statut === 0) {
-          newStatut = 1;
-      } else {
-          newStatut = 0;
-      }
-
-      const result = await login.updateStatut(IdE, newStatut);
-
-      if (result.affectedRows === 0) {
-          res.status(404).json({ success: false, message: 'Profil non trouvé.' });
-      } else {
-          res.status(200).json({ success: true, message: 'Statut mis à jour avec succès.' });
-      }
+    if (result.affectedRows === 0) {
+      res.status(404).json({ success: false, message: 'Profil non trouvé.' });
+    } else {
+      res.status(200).json({ success: true, message: 'Statut mis à jour avec succès.' });
+    }
   } catch (error) {
-      res.status(500).json({ success: false, message: 'Erreur lors de la mise à jour du statut.', error: error.message });
+    console.error("Erreur lors de la mise à jour du statut :", error);
+    res.status(500).json({ success: false, message: 'Erreur lors de la mise à jour du statut.', error: error.message });
   }
 }
 static async updateProfil(req, res) {

@@ -150,7 +150,7 @@ static supProfil(IdE){
     }
     static updateStatut(IdE, newStatut) {
         return new Promise((resolve, reject) => {
-            db.query('UPDATE profil SET Statut = ? WHERE IdE = ?', [newStatut, IdE], (error, results) => {
+            db.query('UPDATE profil SET Statut = ? WHERE IdE = ?', [newStatut,IdE], (error, results) => {
                 if (error) {
                     console.error("Erreur lors de la mise à jour du statut :", error);
                     reject(error);
