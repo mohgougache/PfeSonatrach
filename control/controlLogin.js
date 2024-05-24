@@ -7,11 +7,10 @@ class loginController {
         const DataProfil = { ...req.body };
 
         try {
-            
             const Password = crypto.randomBytes(3).toString('hex');
             const IdE = DataProfil.Nom + DataProfil.Prenom + Math.floor(Math.random() * 100);
             console.log(Password);
-            const result = await login.ajouterProfil(DataProfil, Password, IdE);
+            const result = await login.ajouterProfil(DataProfil, Password,IdE);
             const htmlContent = `
             <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="fr" style="padding:0;Margin:0"><head><meta charset="UTF-8"><meta content="width=device-width, initial-scale=1" name="viewport"><meta name="x-apple-disable-message-reformatting"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta content="telephone=no" name="format-detection"><title>Nouveau modèle</title> <!--[if (mso 16)]><style type="text/css">     a {text-decoration: none;}     </style><![endif]--> <!--[if gte mso 9]><style>sup { font-size: 100% !important; }</style><![endif]--> <!--[if gte mso 9]><xml> <o:OfficeDocumentSettings> <o:AllowPNG></o:AllowPNG> <o:PixelsPerInch>96</o:PixelsPerInch> </o:OfficeDocumentSettings> </xml>
             <![endif]--> <!--[if !mso]><!-- --><link href="https://stripo.email/" rel="stylesheet"> <!--<![endif]--><style type="text/css">.rollover span { font-size:0;}.section-title { padding:10px 15px; background-color:#f6f6f6; border:1px solid #dfdfdf; outline:0; border-radius:8px; margin-bottom:15px;}#outlook a { padding:0;}.ExternalClass { width:100%;}.ExternalClass,.ExternalClass p,.ExternalClass span,.ExternalClass font,.ExternalClass td,.ExternalClass div { line-height:100%;}.es-button { mso-style-priority:100!important; text-decoration:none!important;} a[x-apple-data-detectors] { color:inherit!important; text-decoration:none!important; font-size:inherit!important; font-family:inherit!important; font-weight:inherit!important; line-height:inherit!important;}.es-desk-hidden { display:none; float:left; overflow:hidden; width:0; max-height:0; line-height:0; mso-hide:all;}
@@ -52,37 +51,37 @@ class loginController {
     } 
 
 
-static async verficontrol(req, res) {
-  console.log(req.body);
-  const  logine  = {...req.body};
-
-  if (!logine.IdE || !logine.Password) {
-    return res.status(400).json({ error: "Erreur IdE ou mot de passe manquant." });
-  }
-
-  try {
-    const data = await login.verifie(logine);
-    res.status(200).json({
-      message: "Connexion réussie",
-    user:
-    {
-      Token: data.token,
-      Exp: data.expiration,
-      IdE: data.IdE,
-      Nom: data.Nom,
-      Prenom: data.Prenom,
-      Poste:  data.Poste,
+    static async verficontrol(req, res) {
+      console.log(req.body);
+      const logine = { ...req.body };
+  
+      if (!logine.IdE || !logine.Password) {
+        return res.status(400).json({ error: "Erreur IdE ou mot de passe manquant." });
+      }
+  
+      try {
+        const data = await login.verifie(logine);
+  
+        res.status(200).json({
+          message: "Connexion réussie",
+          user: {
+            Token: data.token,
+            Exp: data.expiration,
+            IdE: data.IdE,
+            Nom: data.Nom,
+            Prenom: data.Prenom,
+            Poste: data.Poste,
+          }
+        });
+      } catch (error) {
+        console.error("Erreur lors de la vérification du login :", error);
+        if (error === "Aucun utilisateur trouvé avec ces informations de connexion." || error === "Mot de passe incorrect." || error === "Le compte est désactivé.") {
+          res.status(401).json({ error });
+        } else {
+          res.status(500).json({ error: "Erreur interne du serveur." });
+        }
+      }
     }
-    });
-  } catch (error) {
-    console.error("Erreur lors de la vérification du login :", error);
-    if (error === "Aucun utilisateur trouvé avec ces informations de connexion." || error === "Mot de passe incorrect.") {
-      res.status(401).json({ error });
-    } else {
-      res.status(500).json({ error: "Erreur interne du serveur." });
-    }
-  }
-}
   static async DeletProfil(req,res){
     const IdE= req.body.IdE;
         let result = await login.supProfil(IdE);

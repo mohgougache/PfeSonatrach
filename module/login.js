@@ -31,62 +31,68 @@ class logModele {
 
 
 static async verifie(login) {
-  return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       db.query(
-          "SELECT * FROM profil WHERE IdE = ? AND Statut = 1",
-          [login.IdE],
-          async (error, result) => {
-              if (error) {
-                  console.error("Erreur lors de la vérification du login :", error);
-                  reject(error);
-                  return;
-              }
-
-              if (result && result.length > 0) {
-                  console.log("Mot de passe haché dans la base de données :", result[0].Password); // Journal de débogage
-                  console.log("Mot de passe fourni par l'utilisateur :", login.Password); // Journal de débogage
-
-                  try {
-                      const match = await bcrypt.compare(login.Password, result[0].Password); // Comparer les mots de passe
-                      console.log("Résultat de la comparaison des mots de passe :", match); // Journal de débogage
-                      if (match) {
-                          const token = crypto.randomUUID();
-                          const expiration = new Date(Date.now() + 8 * 60 * 60 * 1000); // 8 heures
-                          db.query(
-                              "INSERT INTO `section`(`Token`, `IdE`, `Exp`) VALUES (?, ?, ?)",
-                              [token, result[0].IdE, expiration],
-                              (err, resu) => {
-                                  if (err) {
-                                      console.error("Erreur lors de l'insertion du token dans la table 'section' :", err);
-                                      reject(err);
-                                  } else {
-                                      resolve({ 
-                                        token, 
-                                        expiration, 
-                                        IdE: result[0].IdE,
-                                        Nom: result[0].Nom,
-                                        Prenom: result[0].Prenom,
-                                        Poste: result[0].Poste 
-                                      });
-                                  }
-                              }
-                          );
-                      } else {
-                          console.error("Mot de passe incorrect."); // Journal de débogage
-                          reject("Mot de passe incorrect.");
-                      }
-                  } catch (err) {
-                      console.error("Erreur lors de la vérification du mot de passe :", err);
-                      reject(err);
-                  }
-              } else {
-                  console.error("Aucun utilisateur trouvé avec ces informations de connexion."); // Journal de débogage
-                  reject("Aucun utilisateur trouvé avec ces informations de connexion.");
-              }
+        "SELECT * FROM profil WHERE IdE = ?",
+        [login.IdE],
+        async (error, result) => {
+          if (error) {
+            console.error("Erreur lors de la vérification du login :", error);
+            reject(error);
+            return;
           }
+
+          if (result && result.length > 0) {
+            if (result[0].Statut === 0) {
+                console.log("Le compte est désactivé.");
+              reject("Le compte est désactivé.");
+              return;
+            }
+
+            console.log("Mot de passe haché dans la base de données :", result[0].Password); // Journal de débogage
+            console.log("Mot de passe fourni par l'utilisateur :", login.Password); // Journal de débogage
+
+            try {
+              const match = await bcrypt.compare(login.Password, result[0].Password); // Comparer les mots de passe
+              console.log("Résultat de la comparaison des mots de passe :", match); // Journal de débogage
+              if (match) {
+                const token = crypto.randomUUID();
+                const expiration = new Date(Date.now() + 8 * 60 * 60 * 1000); // 8 heures
+                db.query(
+                  "INSERT INTO `section`(`Token`, `IdE`, `Exp`) VALUES (?, ?, ?)",
+                  [token, result[0].IdE, expiration],
+                  (err, resu) => {
+                    if (err) {
+                      console.error("Erreur lors de l'insertion du token dans la table 'section' :", err);
+                      reject(err);
+                    } else {
+                      resolve({
+                        token,
+                        expiration,
+                        IdE: result[0].IdE,
+                        Nom: result[0].Nom,
+                        Prenom: result[0].Prenom,
+                        Poste: result[0].Poste
+                      });
+                    }
+                  }
+                );
+              } else {
+                console.error("Mot de passe incorrect."); // Journal de débogage
+                reject("Mot de passe incorrect.");
+              }
+            } catch (err) {
+              console.error("Erreur lors de la vérification du mot de passe :", err);
+              reject(err);
+            }
+          } else {
+            console.error("Aucun utilisateur trouvé avec ces informations de connexion."); // Journal de débogage
+            reject("Aucun utilisateur trouvé avec ces informations de connexion.");
+          }
+        }
       );
-  });
-}
+    });
+  }
 static supProfil(IdE){
     return new Promise(async (resolve, reject) => {
         db.query(
