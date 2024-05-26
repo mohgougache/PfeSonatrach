@@ -129,18 +129,22 @@ static async verifie(login) {
     });
 }
 
-    static getAllProfils() {
-        return new Promise((resolve, reject) => {
-            db.query('SELECT IdE,Nom, Prenom, Email,Poste, Statut FROM profil', (error, results) => {
-                if (error) {
-                    console.error("Erreur lors de la récupération des profils :", error);
-                    reject(error);
-                } else {
-                    resolve(results); 
-                }
-            });
+static getAllProfils() {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT IdE, Nom, Prenom, Email, Poste, Statut FROM profil WHERE Poste != ?';
+        const params = ['poste4'];
+
+        db.query(sql, params, (error, results) => {
+            if (error) {
+                console.error("Erreur lors de la récupération des profils :", error);
+                reject(error);
+            } else {
+                resolve(results);
+            }
         });
-    }
+    });
+}
+
     
     static getProfil(IdE) {
         return new Promise((resolve, reject) => {
