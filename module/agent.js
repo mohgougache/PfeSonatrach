@@ -144,9 +144,61 @@ class AgentModule{
           });
       });
   }
-    
-    static suppAgent(agentId) {
+  
+  static supVisite(id) {
       return new Promise((resolve, reject) => {
+          db.beginTransaction((err) => {
+              if (err) {
+                  return reject(err);
+              }
+  
+              const tables = [
+                  'cadiovasculaire', 'respiratoire', 'neuropsychisme', 'opht', 'orl',
+                  'peaumuqueuses', 'explorationsfonctionnelles', 'genitourinaire',
+                  'hematogg', 'locomoteur', 'digestif', 'endocrino', 'exemenscomplementaires'
+              ];
+  
+              let deleteFromTablePromises = tables.map((table) => {
+                  return new Promise((resolve, reject) => {
+                      db.query(`DELETE FROM ${table} WHERE IdV = ?`, [id], (err, result) => {
+                          if (err) {
+                              return reject(err);
+                          }
+                          resolve(result);
+                      });
+                  });
+              });
+  
+              Promise.all(deleteFromTablePromises)
+                  .then(() => {
+                      db.query('DELETE FROM visite WHERE IdV = ?', [id], (err, result) => {
+                          if (err) {
+                              return db.rollback(() => {
+                                  reject(err);
+                              });
+                          }
+  
+                          db.commit((err) => {
+                              if (err) {
+                                  return db.rollback(() => {
+                                      reject(err);
+                                  });
+                              }
+                              resolve(result);
+                          });
+                      });
+                  })
+                  .catch((err) => {
+                      db.rollback(() => {
+                          reject(err);
+                      });
+                  });
+          });
+      });
+  }
+  
+  static async suppAgent(agentId) {
+    return new Promise((resolve, reject) => {
         db.beginTransaction(async (err) => {
             if (err) {
                 return reject(err);
@@ -162,7 +214,7 @@ class AgentModule{
                 }
 
                 // Supprimer les entrées dans 'postes' associées à l'agent
-                await new Promise((resolve, reject) => {
+                const postesResult = await new Promise((resolve, reject) => {
                     db.query('DELETE FROM postes WHERE IdA = ?', [agentId], (err, result) => {
                         if (err) {
                             return reject(err);
@@ -172,7 +224,7 @@ class AgentModule{
                 });
 
                 // Supprimer les entrées dans 'rdv' associées à l'agent
-                await new Promise((resolve, reject) => {
+                const rdvResult = await new Promise((resolve, reject) => {
                     db.query('DELETE FROM rdv WHERE IdA = ?', [agentId], (err, result) => {
                         if (err) {
                             return reject(err);
@@ -182,7 +234,7 @@ class AgentModule{
                 });
 
                 // Supprimer l'agent
-                await new Promise((resolve, reject) => {
+                const agentResult = await new Promise((resolve, reject) => {
                     db.query('DELETE FROM agent WHERE IdA = ?', [agentId], (err, result) => {
                         if (err) {
                             return reject(err);
@@ -197,7 +249,12 @@ class AgentModule{
                             reject(err);
                         });
                     }
-                    resolve();
+                    // Vérifiez si des lignes ont été affectées par la suppression de l'agent
+                    if (agentResult.affectedRows > 0) {
+                        resolve(agentResult);
+                    } else {
+                        resolve(null);
+                    }
                 });
             } catch (error) {
                 return db.rollback(() => {
@@ -206,7 +263,9 @@ class AgentModule{
             }
         });
     });
-  }
+}
+
+  
   
   
   
@@ -290,57 +349,7 @@ class AgentModule{
       });
     });
   } 
-  static supVisite(id) {
-    return new Promise((resolve, reject) => {
-        db.beginTransaction((err) => {
-            if (err) {
-                return reject(err);
-            }
-
-            const tables = [
-                'cadiovasculaire', 'respiratoire', 'neuropsychisme', 'opht', 'orl',
-                'peaumuqueuses', 'explorationsfonctionnelles', 'genitourinaire',
-                'hematogg', 'locomoteur', 'digestif', 'endocrino','exemenscomplementaires'
-            ];
-
-            let deleteFromTablePromises = tables.map((table) => {
-                return new Promise((resolve, reject) => {
-                    db.query(`DELETE FROM ${table} WHERE IdV = ?`, [id], (err, result) => {
-                        if (err) {
-                            return reject(err);
-                        }
-                        resolve(result);
-                    });
-                });
-            });
-
-            Promise.all(deleteFromTablePromises)
-                .then(() => {
-                    db.query('DELETE FROM visite WHERE IdV = ?', [id], (err, result) => {
-                        if (err) {
-                            return db.rollback(() => {
-                                reject(err);
-                            });
-                        }
-
-                        db.commit((err) => {
-                            if (err) {
-                                return db.rollback(() => {
-                                    reject(err);
-                                });
-                            }
-                            resolve(result);
-                        });
-                    });
-                })
-                .catch((err) => {
-                    db.rollback(() => {
-                        reject(err);
-                    });
-                });
-        });
-    });
-}
+ 
 }
 
 

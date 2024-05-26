@@ -48,11 +48,12 @@ class AgentControl{
             return res.status(400).json({ error: "Les données de l'agent et du poste sont requises." });
         }
     
-        try {
+        try { 
             const result = await agent.ajouterAgentAndPoste(agente, postes);
             if (result) {
                 res.status(200).json({ message: 'Insertion réussie de l\'agent et du poste', result });
-            } else {
+            } else { 
+               
                 res.status(401).json({ error: "Erreur d'insertion" });
             }
         } catch (error) {
@@ -76,19 +77,17 @@ class AgentControl{
         }
     }
     
-       static async deleteAgent(req, res) {
+    static async deleteAgent(req, res) {
         const IdA = req.params.IdA; // Supposons que l'ID de l'agent à supprimer est passé en paramètre d'URL
-
+    
         try {
-            
             const result = await agent.suppAgent(IdA);
-            if(result)
-           
-            res.status(200).json({ message: 'Agent supprimé avec succès' });
-            else {
-                res.status(401).json({ error: "erreur de supprime " });
+            console.log("Résultat de suppAgent :", result); // Ajouté pour le débogage
+            if (result) {
+                res.status(200).json({ message: 'Agent supprimé avec succès' });
+            } else {
+                res.status(401).json({ error: "Erreur de suppression" });
             }
-
         } catch (error) {
             console.error("Erreur lors de la suppression de l'agent :", error);
             res.status(500).json({ error: "Erreur lors de la suppression de l'agent" });
