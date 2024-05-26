@@ -82,17 +82,23 @@ class loginController {
         }
       }
     }
-  static async DeletProfil(req,res){
-    const IdE= req.body.IdE;
+  static async DeletProfil(req, res) {
+    const IdE = req.body.IdE;
+
+    try {
         let result = await login.supProfil(IdE);
         const profils = await login.getAllProfils();
-        if(result && profils){
-          res.status(200).json({ message: "bien supprime Profil",data:[...profils]});
+        
+        if (result && profils) {
+            res.status(200).json({ message: "Profil supprimé avec succès", data: [...profils] });
+        } else {
+            res.status(401).json({ error: "Il y a un problème dans la requête" });
         }
-        else {
-            res.status(401).json({ error: "il ya problame dans la requit"})
-        }
-  }
+    } catch (error) {
+        console.error("Erreur lors de la suppression du profil :", error);
+        res.status(500).json({ error: "Erreur interne du serveur" });
+    }
+}
   static async getProfils(req, res) {
     try {
         const profils = await login.getAllProfils();

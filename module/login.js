@@ -93,22 +93,41 @@ static async verifie(login) {
       );
     });
   }
-static supProfil(IdE){
+  static supProfil(IdE) {
     return new Promise(async (resolve, reject) => {
-        db.query(
-            "DELETE FROM profil WHERE IdE = ? ",
-            [IdE],
-            async (error, result) => {
-                if (error) {
-                    console.error("Erreur lors de la vérification du login :", error);
-                    reject(error);
-                    return;
-                } 
-                else {
-                    resolve(result)
+        try {
+            // Supprimer les enregistrements dans la table `section` d'abord
+            db.query(
+                "DELETE FROM section WHERE IdE = ?",
+                [IdE],
+                (error, result) => {
+                    if (error) {
+                        console.error("Erreur lors de la suppression des sections :", error);
+                        reject(error);
+                        return;
+                    }
+                    
+                    // Ensuite, supprimer le profil correspondant
+                    db.query(
+                        "DELETE FROM profil WHERE IdE = ?",
+                        [IdE],
+                        (error, result) => {
+                            if (error) {
+                                console.error("Erreur lors de la suppression du profil :", error);
+                                reject(error);
+                            } else {
+                                resolve(result);
+                            }
+                        }
+                    );
                 }
-});
-    });}
+            );
+        } catch (error) {
+            console.error("Erreur lors de la suppression :", error);
+            reject(error);
+        }
+    });
+}
 
     static getAllProfils() {
         return new Promise((resolve, reject) => {
