@@ -43,19 +43,24 @@ class AgentControl{
        }
     
     static async InsertAgentAndPoste(req, res) {
-        const { agent, postes } = req.body;
+        const { agente, postes } = req.body;
+        if (!agente || !postes) {
+            return res.status(400).json({ error: "Les données de l'agent et du poste sont requises." });
+        }
+    
         try {
-            const result = await agent.ajouterAgentAndPoste(agentData, postes);
-            if(result){
-                res.status(200).json({ message: 'Insert réussie de l\'agent et du poste', result });
-            } else{
-                res.status(401).json({ error: "erreur de Insert " });
+            const result = await agent.ajouterAgentAndPoste(agente, postes);
+            if (result) {
+                res.status(200).json({ message: 'Insertion réussie de l\'agent et du poste', result });
+            } else {
+                res.status(401).json({ error: "Erreur d'insertion" });
             }
         } catch (error) {
-            console.log( error);
-            res.status(500).json({ error: 'Erreur lors Insert de l\'agent et du poste', message: error.message });
+            console.error(error);
+            res.status(500).json({ error: 'Erreur lors de l\'insertion de l\'agent et du poste', message: error.message });
         }
     }
+    
     static async updateAgentAndPoste(req, res) {
         const { agentData, posteData } = req.body;
         try {
