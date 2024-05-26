@@ -53,43 +53,50 @@ class AgentModule{
     
    
   
-    static  AjouterAgentAndPoste(agentData, posteData) {
+    static async ajouterAgentAndPoste(agentData, posteData) {
       return new Promise((resolve, reject) => {
-        db.beginTransaction((err) => {
-          if (err) {
-            reject(err);
-          }
-    
-          const agentInsertSql = 'INSERT INTO agent (`Division`, `Direction`, `Unite`, `Service`, `Atelier`, `Nom`, `Prenom`, `DateN`, `LieuN`, `Sex`, `Email`, `SitutionFamille`, `Adreese`, `GroupeSanguim`, `Allergie`, `Nss`, `Scolaire`, `Professionnelle`, `Qprofessionnelle`, `ActiProAntet`, `ServiceNational`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
-          db.query(agentInsertSql, [agentData.Division, agentData.Direction, agentData.Unite, agentData.Service, agentData.Atelier, agentData.Nom, agentData.Prenom, agentData.DateN, agentData.LieuN, agentData.Sex, agentData.Email, agentData.SitutionFamille, agentData.Adreese, agentData.GroupeSanguim, agentData.Allergie, agentData.Nss, agentData.Scolaire, agentData.Professionnelle, agentData.Qprofessionnelle, agentData.ActiProAntet, agentData.ServiceNational], (error, agentResult) => {
-            if (error) {
-              return db.rollback(() => { 
-                reject(error);
-              });
-            }
-    
-            const postInsertSql = 'INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) VALUES (?, ?,?,?,?,?)';
-            db.query(postInsertSql, [posteData.Poste, posteData.DateD,posteData.DateF,posteData.RisqueProfess,posteData.Motifs, agentResult.insertId], (error, postResult) => {
-              if (error) {
-                return db.rollback(() => {
-                  reject(error);
-                });
+          db.beginTransaction((err) => {
+              if (err) {
+                  return reject(err);
               }
-    
-              // Si toutes les requêtes sont réussies, on commit la transaction
-              db.commit((error) => {
-                if (error) {
-                  return db.rollback(() => {
-                    reject(error);
+  
+              const agentInsertSql = `INSERT INTO agent 
+                  (Division, Direction, Unite, Service, Atelier, Nom, Prenom, DateN, LieuN, Sex, Email, SitutionFamille, Adreese, GroupeSanguim, Allergie, Nss, Scolaire, Professionnelle, Qprofessionnelle, ActiProAntet, ServiceNational) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  
+              db.query(agentInsertSql, [
+                  agentData.Division, agentData.Direction, agentData.Unite, agentData.Service, agentData.Atelier, agentData.Nom, agentData.Prenom, agentData.DateN, agentData.LieuN, agentData.Sex, agentData.Email, agentData.SitutionFamille, agentData.Adreese, agentData.GroupeSanguim, agentData.Allergie, agentData.Nss, agentData.Scolaire, agentData.Professionnelle, agentData.Qprofessionnelle, agentData.ActiProAntet, agentData.ServiceNational
+              ], (error, agentResult) => {
+                  if (error) {
+                      return db.rollback(() => {
+                          reject(error);
+                      });
+                  }
+  
+                  const postInsertSql = 'INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) VALUES (?, ?, ?, ?, ?, ?)';
+  
+                  db.query(postInsertSql, [
+                      posteData.Poste, posteData.DateD, posteData.DateF, posteData.RisqueProfess, posteData.Motifs, agentResult.insertId
+                  ], (error, postResult) => {
+                      if (error) {
+                          return db.rollback(() => {
+                              reject(error);
+                          });
+                      }
+  
+                      db.commit((error) => {
+                          if (error) {
+                              return db.rollback(() => {
+                                  reject(error);
+                              });
+                          }
+                          resolve({ agent: agentResult, post: postResult });
+                      });
                   });
-                }
-                resolve({ agent: agentResult, post: postResult });
-              });
-            });
+              }); 
           });
-        });
       });
-    }
+  }
     static  ModifieAgentAndPoste(agentData, posteData) {
       return new Promise((resolve, reject) => {
         db.beginTransaction((err) => {

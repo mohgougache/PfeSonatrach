@@ -43,9 +43,9 @@ class AgentControl{
        }
     
     static async InsertAgentAndPoste(req, res) {
-        const { agentData, posteData } = req.body;
+        const { agent, postes } = req.body;
         try {
-            const result = await agent.InsertAgentAndPoste(agentData, posteData);
+            const result = await agent.ajouterAgentAndPoste(agentData, postes);
             if(result){
                 res.status(200).json({ message: 'Insert réussie de l\'agent et du poste', result });
             } else{
