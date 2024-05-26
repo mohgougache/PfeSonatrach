@@ -43,7 +43,10 @@ class AgentControl{
        }
     
     static async InsertAgentAndPoste(req, res) {
-        const { agente, postes } = req.body;
+
+        const agente ={...req.body.agent};
+        const postes ={...req.body.postes};
+        console.log(req.body);
         if (!agente || !postes) {
             return res.status(400).json({ error: "Les données de l'agent et du poste sont requises." });
         }
@@ -63,9 +66,10 @@ class AgentControl{
     }
     
     static async updateAgentAndPoste(req, res) {
-        const { agentData, posteData } = req.body;
+        const agente ={...req.body.agent};
+        const poste ={...req.body.postes};
         try {
-            const result = await agent.ModifieAgentAndPoste(agentData, posteData);
+            const result = await agent.ModifieAgentAndPoste(agente, poste);
             if(result){
                 res.status(200).json({ message: 'Updit réussie de l\'agent et du poste', result });
             } else{
