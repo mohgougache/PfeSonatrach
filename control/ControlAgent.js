@@ -67,9 +67,10 @@ class AgentControl{
     
     static async updateAgentAndPoste(req, res) {
         const agente ={...req.body.agent};
-        const postes ={...req.body.poste};
-        try {
-            const result = await agent.ModifieAgentAndPoste(agente, postes);
+        const postes =[...req.body.postes];
+        try { 
+            
+            const result = await agent.ModifieAgentAndPoste(agente, postes); 
             if(result){
                 res.status(200).json({ message: 'Updit réussie de l\'agent et du poste', result });
             } else{

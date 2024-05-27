@@ -140,43 +140,74 @@ class AgentModule{
           });
       });
   }
-    static  ModifieAgentAndPoste(agentData, posteData) { 
-      return new Promise((resolve, reject) => {
-        db.beginTransaction((err) => {
-          if (err) {
-            reject(err);
+  static async ModifieAgentAndPoste(agentData, postesData) { 
+    return new Promise((resolve, reject) => {
+      db.beginTransaction((err) => {
+        if (err) {
+          return reject(err);
+        }
+  
+        const agentUpdateSql = 'UPDATE agent SET ? WHERE IdA = ?';
+        db.query(agentUpdateSql, [agentData, agentData.IdA], (error, agentResult) => {
+          if (error) {
+            return db.rollback(() => {
+              reject(error);
+            });
           }
-    
-          const agentInsertSql = 'UPDATE agent SET ? WHERE IdA = ?';
-          db.query(agentInsertSql, [agentData,agentData.IdA], (error, agentResult) => {
+  
+          // Vérification que postesData est un tableau
+          if (!Array.isArray(postesData)) {
+            return db.rollback(() => {
+              reject(new TypeError('postesData should be an array'));
+            });
+          }
+  
+          // Suppression de tous les anciens postes avant d'insérer les nouveaux
+          const deletePostesSql = 'DELETE FROM postes WHERE IdA = ?';
+          db.query(deletePostesSql, [agentData.IdA], (error, deleteResult) => {
             if (error) {
-              return db.rollback(() => { 
+              return db.rollback(() => {
                 reject(error);
               });
             }
-    
-            const postInsertSql = 'UPDATE postes SET ? WHERE IdA = ?';
-            db.query(postInsertSql, [posteData,agentData.IdA], (error, postResult) => {
-              if (error) {
-                return db.rollback(() => {
-                  reject(error);
+  
+            // Insertion des nouveaux postes
+            const postInsertPromises = postesData.map(poste => {
+              return new Promise((resolve, reject) => {
+                const postInsertSql = 'INSERT INTO postes SET ?';
+                const postData = { ...poste, IdA: agentData.IdA };
+                db.query(postInsertSql, postData, (error, postResult) => {
+                  if (error) {
+                    console.log('Error inserting post:', error);
+                    return reject(error);
+                  }
+                  resolve(postResult);
                 });
-              }
-    
-              // Si toutes les requêtes sont réussies, on commit la transaction
-              db.commit((error) => {
-                if (error) {
-                  return db.rollback(() => {
-                    reject(error);
-                  });
-                }
-                resolve({ agent: agentResult, post: postResult });
               });
             });
+  
+            Promise.all(postInsertPromises)
+              .then(results => {
+                db.commit((commitError) => {
+                  if (commitError) {
+                    return db.rollback(() => {
+                      reject(commitError);
+                    });
+                  }
+                  resolve({ agent: agentResult, postes: results });
+                });
+              })
+              .catch(error => {
+                db.rollback(() => {
+                  reject(error);
+                });
+              });
           });
         });
       });
-    }
+    });
+  }
+  
     static getVisitesByAgentId(agentId) {
       return new Promise((resolve, reject) => {
           db.query('SELECT IdV FROM visite WHERE IdA = ?', [agentId], (err, results) => {
