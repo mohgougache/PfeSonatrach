@@ -18,50 +18,67 @@ class AgentModule{
         })
      })
     }
-    static async getagent(IdA)
-    {
-      return new Promise((resolve, reject) => {
-        const agentQuery = `
-            SELECT * FROM agent WHERE IdA = ?;
-        `;
-
-        const postesQuery = `
-            SELECT * FROM postes WHERE IdA = ?;
-        `;
-
-        db.query(agentQuery, [IdA], (agentError, agentResult) => {
-            if (agentError) {
-                console.log("Erreur lors de la récupération de l'agent :", agentError);
-                return reject(agentError);
-            }
-
-            if (agentResult.length === 0) {
-                return resolve(null);
-            }
-
-            const agent = agentResult[0];
-
-            // Formater les dates de l'agent
-            agent.DateN = moment(agent.DateN).format('YYYY-MM-DD');
-
-            db.query(postesQuery, [IdA], (postesError, postesResult) => {
-                if (postesError) {
-                    console.log("Erreur lors de la récupération des postes :", postesError);
-                    return reject(postesError);
+    static async getagent(IdA) {
+        return new Promise((resolve, reject) => {
+            const agentQuery = `
+                SELECT * FROM agent WHERE IdA = ?;
+            `;
+    
+            const postesQuery = `
+                SELECT * FROM postes WHERE IdA = ?;
+            `;
+    
+            db.query(agentQuery, [IdA], (agentError, agentResult) => {
+                if (agentError) {
+                    console.log("Erreur lors de la récupération de l'agent :", agentError);
+                    return reject(agentError);
                 }
-
-                // Formater les dates des postes
-                const postes = postesResult.map(poste => {
-                    poste.DateD = moment(poste.DateD).format('YYYY-MM-DD');
-                    poste.DateF = moment(poste.DateF).format('YYYY-MM-DD');
-                    return poste;
+    
+                if (agentResult.length === 0) {
+                    return resolve(null);
+                }
+    
+                const agent = agentResult[0];
+    
+                // Formater les dates de l'agent
+                agent.DateN = agent.DateN ? moment(agent.DateN).format('YYYY-MM-DD') : "";
+    
+                db.query(postesQuery, [IdA], (postesError, postesResult) => {
+                    if (postesError) {
+                        console.log("Erreur lors de la récupération des postes :", postesError);
+                        return reject(postesError);
+                    }
+    
+                    // Formater les dates des postes
+                    const postes = postesResult.map(poste => {
+                        poste.DateD = poste.DateD ? moment(poste.DateD).format('YYYY-MM-DD') : "";
+                        poste.DateF = poste.DateF ? moment(poste.DateF).format('YYYY-MM-DD') : "";
+                        return poste;
+                    });
+    
+                    resolve({ agent: agent, postes: postes });
                 });
-
-                resolve({ agent: agent, postes: postes });
             });
         });
-    });
-}
+    }
+    
+    static async selctagent(req, res) {
+        console.log(req.body);
+        const IdA = req.body?.IdA;
+        try {
+            const result = await agent.getagent(IdA);
+            if (result) {
+                res.status(200).json(result);
+                console.log(result);
+            } else {
+                res.status(404).json({ error: "Agent non trouvé" });
+            }
+        } catch (error) {
+            console.error("Erreur lors de la récupération de l'agent :", error);
+            res.status(500).json({ error: "Erreur interne du serveur" });
+        }
+    }
+    
     static async getAgent()
     {
      return new Promise(resolve =>{
