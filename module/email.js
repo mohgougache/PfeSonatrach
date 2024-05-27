@@ -1,6 +1,5 @@
-// 
+ 
 import nodemailer from 'nodemailer';
-import fs from 'fs';
 
 class Email {
     static async email(userEmail, subject, htmlContent) {

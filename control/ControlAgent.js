@@ -84,20 +84,23 @@ class AgentControl{
     
     static async deleteAgent(req, res) {
         const IdA = req.params.IdA; // Supposons que l'ID de l'agent à supprimer est passé en paramètre d'URL
-    
+
         try {
-            const result = await agent.suppAgent(IdA);
-            console.log("Résultat de suppAgent :", result); // Ajouté pour le débogage
-            if (result) {
-                res.status(200).json({ message: 'Agent supprimé avec succès' });
-            } else {
-                res.status(401).json({ error: "Erreur de suppression" });
-            }
+          const result = await agent.suppAgent(IdA);
+          console.log("Résultat de suppAgent :", result); // Ajouté pour le débogage
+          if (result) {
+            const data = await agent.getagentall();
+            res.status(200).json({ message: 'Agent supprimé avec succès', data });
+          } else {
+            res.status(401).json({ error: "Erreur de suppression" });
+          }
         } catch (error) {
-            console.error("Erreur lors de la suppression de l'agent :", error);
-            res.status(500).json({ error: "Erreur lors de la suppression de l'agent" });
+          console.error("Erreur lors de la suppression de l'agent :", error);
+          res.status(500).json({ error: "Erreur lors de la suppression de l'agent" });
         }
-    }
+      }
+    
+    
     
        
        static async envoyerEmailEtInsert(req, res) { 
