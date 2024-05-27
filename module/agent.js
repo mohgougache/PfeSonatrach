@@ -19,23 +19,40 @@ class AgentModule{
     }
     static async getagent(IdA)
     {
-        return new Promise((resolve) => {
-            db.query(
-              "SELECT * FROM agent WHERE IdA= ?  ",
-              [IdA],
-              (error, result) => {
-                if (!error) {
-                  resolve(result);
-                  console.log( resolve(result));
+      return new Promise((resolve, reject) => {
+        const agentQuery = `
+            SELECT * FROM agent WHERE IdA = ?;
+        `;
+
+        const postesQuery = `
+            SELECT * FROM postes WHERE IdA = ?;
+        `;
+
+        db.query(agentQuery, [IdA], (agentError, agentResult) => {
+            if (agentError) {
+                console.log("Erreur lors de la récupération de l'agent :", agentError);
+                return reject(agentError);
+            }
+
+            if (agentResult.length === 0) {
+                return resolve(null);
+            }
+
+            const agent = agentResult[0];
+
+            db.query(postesQuery, [IdA], (postesError, postesResult) => {
+                if (postesError) {
+                    console.log("Erreur lors de la récupération des postes :", postesError);
+                    return reject(postesError);
                 }
-                if (error) {
-                  console.log(error);
-                }
-              }
-            );
-      
-          });
-    }
+
+                const postes = postesResult;
+
+                resolve({ agent: agent, postes: postes });
+            });
+        });
+    });
+}
     static async getAgent()
     {
      return new Promise(resolve =>{
@@ -97,7 +114,7 @@ class AgentModule{
           });
       });
   }
-    static  ModifieAgentAndPoste(agentData, posteData) {
+    static  ModifieAgentAndPoste(agentData, posteData) { 
       return new Promise((resolve, reject) => {
         db.beginTransaction((err) => {
           if (err) {

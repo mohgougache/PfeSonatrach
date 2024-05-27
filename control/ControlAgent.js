@@ -15,20 +15,20 @@ class AgentControl{
         }
        }
 
-       static async selctagent(req,res){
-        console.log(req.body);
-        const idA = req.body?.IdA;
-        let results = await agent.getagent(idA);
-        if(results){
-            res.status(200).json(results);
-            console.log(results);
+       static async selectAgent(req, res) {
+        const IdA = req.body?.IdA;
+        try {
+            let result = await agent.getagent(IdA);
+            if (result) {
+                res.status(200).json(result);
+            } else {
+                res.status(404).json({ error: "Agent non trouvé" });
+            }
+        } catch (error) {
+            console.error("Erreur lors de la récupération de l'agent et des postes :", error);
+            res.status(500).json({ error: "Erreur interne du serveur" });
         }
-        else {
-            res.status(401).json({ error: "il ya problame dans la requit" });
-          
-        }
-       }
-
+    }
        static async selctAgent2(req,res){
         
         let results = await agent.getAgent();
@@ -45,7 +45,7 @@ class AgentControl{
     static async InsertAgentAndPoste(req, res) {
 
         const agente ={...req.body.agent};
-        const postes ={...req.body.postes};
+        const postes ={...req.body.poste};
         console.log(req.body);
         if (!agente || !postes) {
             return res.status(400).json({ error: "Les données de l'agent et du poste sont requises." });
@@ -67,9 +67,9 @@ class AgentControl{
     
     static async updateAgentAndPoste(req, res) {
         const agente ={...req.body.agent};
-        const poste ={...req.body.postes};
+        const postes ={...req.body.poste};
         try {
-            const result = await agent.ModifieAgentAndPoste(agente, poste);
+            const result = await agent.ModifieAgentAndPoste(agente, postes);
             if(result){
                 res.status(200).json({ message: 'Updit réussie de l\'agent et du poste', result });
             } else{
