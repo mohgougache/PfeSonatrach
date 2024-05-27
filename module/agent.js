@@ -1,5 +1,6 @@
 // import { type } from "express/lib/response.js";
 import db from "../baseDonne/connection.js";
+import moment from 'moment';
 class AgentModule{
     
     
@@ -40,13 +41,21 @@ class AgentModule{
 
             const agent = agentResult[0];
 
+            // Formater les dates de l'agent
+            agent.DateN = moment(agent.DateN).format('YYYY-MM-DD');
+
             db.query(postesQuery, [IdA], (postesError, postesResult) => {
                 if (postesError) {
                     console.log("Erreur lors de la récupération des postes :", postesError);
                     return reject(postesError);
                 }
 
-                const postes = postesResult;
+                // Formater les dates des postes
+                const postes = postesResult.map(poste => {
+                    poste.DateD = moment(poste.DateD).format('YYYY-MM-DD');
+                    poste.DateF = moment(poste.DateF).format('YYYY-MM-DD');
+                    return poste;
+                });
 
                 resolve({ agent: agent, postes: postes });
             });

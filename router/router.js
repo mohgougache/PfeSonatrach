@@ -14,7 +14,7 @@ router.post("/api/statut", controll.changeStatut);
 router.put("/api/modifieProfil", controll.updateProfil);
 router.post("/api/ajouter", controlA.InsertAgentAndPoste);
 router.get("/api/agentall", controlA.selctALLagent);
-router.get("/api/agent1", controlA.selectAgent);
+router.post("/api/agent1", controlA.selectAgent);
 router.get("/api/agent2", controlA.selctAgent2);
 router.delete("/api/supagent/:IdA", controlA.deleteAgent);
 router.put("/api/modifagent", controlA.updateAgentAndPoste);
