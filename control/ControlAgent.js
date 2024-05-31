@@ -90,7 +90,7 @@ class AgentControl{
           console.log("Résultat de suppAgent :", result); // Ajouté pour le débogage
           if (result) {
             const data = await agent.getagentall();
-            res.status(200).json({ message: 'Agent supprimé avec succès', data });
+            res.status(200).json({ message: 'Agent supprimé avec succès', data }); 
           } else {
             res.status(401).json({ error: "Erreur de suppression" });
           }
@@ -124,7 +124,6 @@ class AgentControl{
         }
       }
       static async selcectRdv(req,res){
-        // const IdA= req.params.IdA;
         const Date= req.body.Date
         let results = await agent.getRendevous(Date);
         if(results){
@@ -173,7 +172,7 @@ class AgentControl{
         }
     }
     static async insererVisite(req, res) {
-        const {Vdata} = req.body;
+        const Vdata ={...req.body};
         try {
           const result = await agent.insererVisite(Vdata);
           res.status(200).json({ message: 'Données de visite insérées avec succès', result });

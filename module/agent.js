@@ -412,17 +412,22 @@ class AgentModule{
   }
   static insererVisite(Vdata) {
     return new Promise((resolve, reject) => {
-      db.query('INSERT INTO visite(`DateV`, `TypeV`, `idA`) VALUES (?, ?, ?)', [Vdata.DateV, Vdata.TypeV, Vdata.idA], (error, result) => {
-        if (error) {
-          console.error("Erreur lors de l'insertion des données de visite :", error);
-          reject(error);
-        } else {
-          console.log("Données de visite insérées avec succès :", result);
-          resolve(result);
+      db.query(
+        'INSERT INTO visite (`DateV`, `TypeV`, `Poids`, `Taille`, `Pt`, `IdA`, `IdE`) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+        [Vdata.DateV, Vdata.TypeV, Vdata.Poids, Vdata.Taille, Vdata.Pt, Vdata.IdA, Vdata.IdE], 
+        (error, result) => {
+          if (error) {
+            console.error("Erreur lors de l'insertion des données de visite :", error);
+            reject(error);
+          } else {
+            console.log("Données de visite insérées avec succès :", result);
+            resolve(result);
+          }
         }
-      });
+      );
     });
   } 
+
  
 }
 
