@@ -439,6 +439,37 @@ class AgentModule{
         });
     });
 }
+static modifierVisite(visiteData) {
+    return new Promise((resolve, reject) => {
+        const query = `
+            UPDATE visite SET 
+                Poids = ?, 
+                Taille = ?, 
+                Pt = ?, 
+                IdA = ?, 
+                IdR = ?, 
+                IdE = ?
+            WHERE IdV = ?
+        `;
+        const values = [
+            visiteData.Poids, 
+            visiteData.Taille, 
+            visiteData.Pt, 
+            visiteData.IdA, 
+            visiteData.IdR, 
+            visiteData.IdE, 
+            visiteData.IdV
+        ];
+
+        db.query(query, values, (err, result) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(result);
+        });
+    });
+}
 }
 
 

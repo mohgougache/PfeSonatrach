@@ -25,6 +25,7 @@ router.put("/api/modifRdv", controlA.updateRdv);
 router.post("/api/certificat", controlC.InsertCertificat);
 router.post("/api/visite", controlA.insererVisite);
 router.post("/api/visiteDeJour", controlA.getVisitesDuJour);
+router.put("/api/modifierVisite", controlA.modifierVisite);
 router.delete("/api/supvisite/:IdV", controlA.deleteVisite);
 router.post("/api/Cardiovasculaire",controlD.insertCardiovasculaire) ;
 router.post("/api/Digestif",controlD.insertDigestif) ;

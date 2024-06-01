@@ -201,5 +201,15 @@ class AgentControl{
           res.status(500).json({ error: 'Erreur lors de la récupération des visites' });
         }
       }
+      static async modifierVisite(req, res) {
+        try {
+            const visiteData = req.body; // Assurez-vous que toutes les données nécessaires sont envoyées dans le corps de la requête
+            const result = await agent.modifierVisite(visiteData);
+            res.status(200).json({ message: 'Visite modifiée avec succès', result });
+        } catch (err) {
+            console.error("Erreur lors de la modification de la visite :", err);
+            res.status(500).json({ error: 'Erreur lors de la modification de la visite' });
+        }
+    }
 }
   export default  AgentControl;
