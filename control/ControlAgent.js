@@ -149,10 +149,9 @@ class AgentControl{
     } 
     static async updateRdv(req, res) {
         const Data = {...req.body};  
-        let results = await agent.modifieRdv(Data); // Appel correct de la méthode modifieRdv
+        let results = await agent.modifieRdv(Data); 
         if (results) {
-            res.json(results);
-            console.log(results);
+            res.status(200).json({message:"bien modifie donne base de donne"});
         } else {
             res.status(401).json({ error: "Il y a un problème dans la requête" });
         }
