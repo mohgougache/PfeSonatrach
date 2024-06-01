@@ -397,8 +397,8 @@ class AgentModule{
   static insererVisite(Vdata) {
     return new Promise((resolve, reject) => {
       db.query(
-        'INSERT INTO visite (`DateV`, `Heure`, `TypeV`, `Poids`,`Taille`, `Pt`, `IdA`, `IdE`,Statut) VALUES (?,?,?, ?, ?, ?, ?, ?,1)', 
-        [Vdata.DateV, Vdata.TypeV, Vdata.Heure,Vdata.Poids, Vdata.Taille, Vdata.Pt, Vdata.IdA, Vdata.IdE], 
+        'INSERT INTO visite ( `Poids`,`Taille`, `Pt`, `IdA`, `IdE`,`IdR`,Statut) VALUES (?, ?, ?, ?, ?, ?,1)', 
+        [Vdata.Poids, Vdata.Taille, Vdata.Pt, Vdata.IdA, Vdata.IdE, Vdata.IdR], 
         (error, result) => {
           if (error) {
             console.error("Erreur lors de l'insertion des données de visite :", error);
@@ -413,29 +413,32 @@ class AgentModule{
   } 
   static getVisitesDuJour(Date) {
     return new Promise((resolve, reject) => {
-      const query = `
-        SELECT      IdV, 
-        DATE_FORMAT(DateV, '%Y/%m/%d') as DateV, 
-        Heure,
-        TypeV, 
-        Poids, 
-        Taille, 
-        Pt, 
-        IdA, 
-        IdE, 
-        Statut  FROM visite
-        WHERE  DateV = ?
-      `;
-      db.query(query, [Date],(err, results) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolve(results);
-      });
+        const query = `
+            SELECT
+                visite.IdV,
+                DATE_FORMAT(rdv.Date, '%Y/%m/%d') AS Date,
+                rdv.TypeRdv,
+                rdv.Heure,
+                visite.Poids,
+                visite.Taille,
+                visite.Pt,
+                visite.IdA,
+                visite.IdR,
+                visite.IdE,
+                visite.Statut
+            FROM visite
+            JOIN rdv ON visite.IdR = rdv.IdR
+            WHERE rdv.Date = ?
+        `;
+        db.query(query, [Date], (err, results) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(results);
+        });
     });
-  }
- 
+}
 }
 
 
