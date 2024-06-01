@@ -19,7 +19,7 @@ router.get("/api/agent2", controlA.selctAgent2);
 router.delete("/api/supagent/:IdA", controlA.deleteAgent);
 router.put("/api/modifagent", controlA.updateAgentAndPoste);
 router.post("/api/convocation", controlA.envoyerEmailEtInsert); 
-router.get("/api/selctRdv",controlA.selcectRdv); 
+router.post("/api/selctRdv",controlA.selcectRdv); 
 router.delete("/api/suprdv/:IdR", controlA.deleteRdv);
 router.put("/api/modifRdv", controlA.updateRdv);
 router.post("/api/certificat", controlC.InsertCertificat);

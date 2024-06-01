@@ -148,8 +148,8 @@ class AgentControl{
     
     } 
     static async updateRdv(req, res) {
-        const RdvData = req.body.RdvData;  
-        let results = await agent.modifieRdv(RdvData); // Appel correct de la méthode modifieRdv
+        const Data = {...req.body};  
+        let results = await agent.modifieRdv(Data); // Appel correct de la méthode modifieRdv
         if (results) {
             res.json(results);
             console.log(results);
