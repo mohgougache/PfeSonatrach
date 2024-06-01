@@ -191,6 +191,14 @@ class AgentControl{
             res.status(500).send('Erreur lors de la suppression de la visite');
         }
     }
-   
+    static async getVisitesDuJour(req, res) {
+        try {
+            const Date= req.body.Date;
+          const visites = await agent.getVisitesDuJour(Date);
+          res.status(200).json(visites);
+        } catch (err) {
+          res.status(500).json({ error: 'Erreur lors de la récupération des visites' });
+        }
+      }
 }
   export default  AgentControl;
