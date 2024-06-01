@@ -62,22 +62,6 @@ class AgentModule{
         });
     }
     
-    static async selctagent(req, res) {
-        console.log(req.body);
-        const IdA = req.body?.IdA;
-        try {
-            const result = await agent.getagent(IdA);
-            if (result) {
-                res.status(200).json(result);
-                console.log(result);
-            } else {
-                res.status(404).json({ error: "Agent non trouvé" });
-            }
-        } catch (error) {
-            console.error("Erreur lors de la récupération de l'agent :", error);
-            res.status(500).json({ error: "Erreur interne du serveur" });
-        }
-    }
     
     static async getAgent()
     {
@@ -413,7 +397,7 @@ class AgentModule{
   static insererVisite(Vdata) {
     return new Promise((resolve, reject) => {
       db.query(
-        'INSERT INTO visite (`DateV`, `TypeV`, `Poids`, `Taille`, `Pt`, `IdA`, `IdE`) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+        'INSERT INTO visite (`DateV`, `TypeV`, `Poids`, `Taille`, `Pt`, `IdA`, `IdE`,Statut) VALUES (?, ?, ?, ?, ?, ?, ?,1)', 
         [Vdata.DateV, Vdata.TypeV, Vdata.Poids, Vdata.Taille, Vdata.Pt, Vdata.IdA, Vdata.IdE], 
         (error, result) => {
           if (error) {
@@ -427,7 +411,29 @@ class AgentModule{
       );
     });
   } 
-
+  static getVisitesDuJour() {
+    return new Promise((resolve, reject) => {
+      const query = `
+        SELECT      IdV, 
+        DATE_FORMAT(DateV, '%Y/%m/%d') as DateV, 
+        TypeV, 
+        Poids, 
+        Taille, 
+        Pt, 
+        IdA, 
+        IdE, 
+        Statut  FROM visite
+        WHERE Statut = 0 AND DateV = CURDATE()
+      `;
+      db.query(query, (err, results) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(results);
+      });
+    });
+  }
  
 }
 

@@ -24,6 +24,7 @@ router.delete("/api/suprdv/:IdR", controlA.deleteRdv);
 router.put("/api/modifRdv", controlA.updateRdv);
 router.post("/api/certificat", controlC.InsertCertificat);
 router.post("/api/visite", controlA.insererVisite);
+router.get("/api/visiteDeJour", controlA.getVisitesDuJour);
 router.delete("/api/supvisite/:IdV", controlA.deleteVisite);
 router.post("/api/Cardiovasculaire",controlD.insertCardiovasculaire) ;
 router.post("/api/Digestif",controlD.insertDigestif) ;

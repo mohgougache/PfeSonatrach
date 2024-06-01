@@ -105,7 +105,7 @@ class AgentControl{
        
        static async envoyerEmailEtInsert(req, res) { 
         console.log(req.body);
-        const { ...Data } = req.body;
+        const Data  ={... req.body};
         try {
           const resultE = await agent.selectEmail(Data.IdA); // Appel de la méthode statique selectEmail
           const resultI = await agent.insertRDV(Data); // Appel de la méthode statique insertRDV
@@ -192,6 +192,13 @@ class AgentControl{
             res.status(500).send('Erreur lors de la suppression de la visite');
         }
     }
-
+    static async getVisitesDuJour(req, res) {
+        try {
+          const visites = await agent.getVisitesDuJour();
+          res.status(200).json(visites);
+        } catch (err) {
+          res.status(500).json({ error: 'Erreur lors de la récupération des visites' });
+        }
+      }
 }
   export default  AgentControl;
