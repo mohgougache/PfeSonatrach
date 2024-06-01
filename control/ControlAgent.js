@@ -193,7 +193,8 @@ class AgentControl{
     }
     static async getVisitesDuJour(req, res) {
         try {
-          const visites = await agent.getVisitesDuJour();
+            const Date= req.body.Date;
+          const visites = await agent.getVisitesDuJour(Date);
           res.status(200).json(visites);
         } catch (err) {
           res.status(500).json({ error: 'Erreur lors de la récupération des visites' });

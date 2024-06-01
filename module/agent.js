@@ -397,25 +397,26 @@ class AgentModule{
   static insererVisite(Vdata) {
     return new Promise((resolve, reject) => {
       db.query(
-        'INSERT INTO visite (`DateV`, `TypeV`, `Poids`, `Taille`, `Pt`, `IdA`, `IdE`,Statut) VALUES (?, ?, ?, ?, ?, ?, ?,1)', 
-        [Vdata.DateV, Vdata.TypeV, Vdata.Poids, Vdata.Taille, Vdata.Pt, Vdata.IdA, Vdata.IdE], 
+        'INSERT INTO visite (`DateV`, `Heure`, `TypeV`, `Poids`,`Taille`, `Pt`, `IdA`, `IdE`,Statut) VALUES (?,?,?, ?, ?, ?, ?, ?,1)', 
+        [Vdata.DateV, Vdata.TypeV, Vdata.Heure,Vdata.Poids, Vdata.Taille, Vdata.Pt, Vdata.IdA, Vdata.IdE], 
         (error, result) => {
           if (error) {
             console.error("Erreur lors de l'insertion des données de visite :", error);
             reject(error);
           } else {
-            console.log("Données de visite insérées avec succès :", result);
+            console.log("Données de visite insérées avec succès :", result); 
             resolve(result);
           }
         }
       );
     });
   } 
-  static getVisitesDuJour() {
+  static getVisitesDuJour(Date) {
     return new Promise((resolve, reject) => {
       const query = `
         SELECT      IdV, 
         DATE_FORMAT(DateV, '%Y/%m/%d') as DateV, 
+        Heure,
         TypeV, 
         Poids, 
         Taille, 
@@ -423,9 +424,9 @@ class AgentModule{
         IdA, 
         IdE, 
         Statut  FROM visite
-        WHERE Statut = 0 AND DateV = CURDATE()
+        WHERE  DateV = ?
       `;
-      db.query(query, (err, results) => {
+      db.query(query, [Date],(err, results) => {
         if (err) {
           reject(err);
           return;
