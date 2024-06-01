@@ -358,7 +358,7 @@ class AgentModule{
     }
     static getRendevous(Date) {
       return new Promise(resolve => {
-          db.query("SELECT rdv.IdA,agent.Nom, agent.Prenom, agent.Email, rdv.Heure, rdv.TypeRdv FROM agent JOIN rdv ON agent.IdA = rdv.IdA WHERE rdv.Date = ?", [Date], (error, result) => {
+          db.query("SELECT rdv.IdR,rdv.IdA,agent.Nom, agent.Prenom, agent.Email, rdv.Heure, rdv.TypeRdv FROM agent JOIN rdv ON agent.IdA = rdv.IdA WHERE rdv.Date = ?", [Date], (error, result) => {
               if (!error) {
                   resolve(result);
               } else {
