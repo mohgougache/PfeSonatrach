@@ -397,8 +397,8 @@ class AgentModule{
   static insererVisite(Vdata) {
     return new Promise((resolve, reject) => {
       db.query(
-        'INSERT INTO visite ( `Poids`,`Taille`, `Pt`, `IdA`, `IdE`,`IdR`,Statut) VALUES (?, ?, ?, ?, ?, ?,1)', 
-        [Vdata.Poids, Vdata.Taille, Vdata.Pt, Vdata.IdA, Vdata.IdE, Vdata.IdR], 
+        'INSERT INTO preparevisite ( `Poids`,`Taille`, `Pt`,  `IdE`,`IdR`,Statut) VALUES (?,  ?, ?, ?, ?,1)', 
+        [Vdata.Poids, Vdata.Taille, Vdata.Pt, Vdata.IdE, Vdata.IdR], 
         (error, result) => {
           if (error) {
             console.error("Erreur lors de l'insertion des données de visite :", error);
@@ -415,19 +415,23 @@ class AgentModule{
     return new Promise((resolve, reject) => {
         const query = `
             SELECT
-                visite.IdV,
+            preparevisite.IdP,
+                agent.Nom,
+                agent.Prenom,
+                agent.Email,
                 DATE_FORMAT(rdv.Date, '%Y/%m/%d') AS Date,
                 rdv.TypeRdv,
                 rdv.Heure,
-                visite.Poids,
-                visite.Taille,
-                visite.Pt,
-                visite.IdA,
-                visite.IdR,
-                visite.IdE,
-                visite.Statut
-            FROM visite
-            JOIN rdv ON visite.IdR = rdv.IdR
+                preparevisite.Poids,
+                preparevisite.Taille,
+                preparevisite.Pt,
+                preparevisite.IdR,
+                preparevisite.IdE,
+                preparevisite.Statut
+               
+            FROM preparevisite
+            JOIN rdv ON preparevisite.IdR = rdv.IdR
+            JOIN agent ON rdv.IdA = agent.IdA
             WHERE rdv.Date = ?
         `;
         db.query(query, [Date], (err, results) => {
@@ -442,23 +446,21 @@ class AgentModule{
 static modifierVisite(visiteData) {
     return new Promise((resolve, reject) => {
         const query = `
-            UPDATE visite SET 
+            UPDATE preparevisite SET 
                 Poids = ?, 
                 Taille = ?, 
-                Pt = ?, 
-                IdA = ?, 
+                Pt = ?,  
                 IdR = ?, 
                 IdE = ?
-            WHERE IdV = ?
+            WHERE IdP = ?
         `;
         const values = [
             visiteData.Poids, 
             visiteData.Taille, 
             visiteData.Pt, 
-            visiteData.IdA, 
             visiteData.IdR, 
             visiteData.IdE, 
-            visiteData.IdV
+            visiteData.IdP
         ];
 
         db.query(query, values, (err, result) => {

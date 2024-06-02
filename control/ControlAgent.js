@@ -172,6 +172,7 @@ class AgentControl{
     }
     static async insererVisite(req, res) {
         const Vdata ={...req.body};
+        console.log(Vdata);
         try {
           const result = await agent.insererVisite(Vdata);
           res.status(200).json({ message: 'Données de visite insérées avec succès', result });
