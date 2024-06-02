@@ -394,7 +394,7 @@ class AgentModule{
           });
       });
   }
-  static insererVisite(Vdata) {
+  static insererVisiteP(Vdata) {
     return new Promise((resolve, reject) => {
       db.query(
         'INSERT INTO preparevisite ( `Poids`,`Taille`, `Pt`,  `IdE`,`IdR`,Statut) VALUES (?,  ?, ?, ?, ?,1)', 
@@ -411,7 +411,7 @@ class AgentModule{
       );
     });
   } 
-  static getVisitesDuJour(Date) {
+  static getVisitesPDuJour(Date) {
     return new Promise((resolve, reject) => {
         const query = `
             SELECT
@@ -443,7 +443,7 @@ class AgentModule{
         });
     });
 }
-static modifierVisite(visiteData) {
+static modifierVisiteP(visiteData) {
     return new Promise((resolve, reject) => {
         const query = `
             UPDATE preparevisite SET 
@@ -467,6 +467,17 @@ static modifierVisite(visiteData) {
             if (err) {
                 reject(err);
                 return;
+            }
+            resolve(result);
+        });
+    });
+}
+static supprimerPrepareVisite(IdP) {
+    return new Promise((resolve, reject) => {
+        const query = 'DELETE FROM preparevisite WHERE IdP = ?';
+        db.query(query, [IdP], (err, result) => {
+            if (err) {
+                return reject(err);
             }
             resolve(result);
         });

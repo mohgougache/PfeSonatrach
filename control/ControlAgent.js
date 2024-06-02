@@ -170,11 +170,11 @@ class AgentControl{
             res.status(500).json({ error: 'Erreur lors Insert certificat', message: error.message });
         }
     }
-    static async insererVisite(req, res) {
+    static async insererVisiteP(req, res) {
         const Vdata ={...req.body};
         console.log(Vdata);
         try {
-          const result = await agent.insererVisite(Vdata);
+          const result = await agent.insererVisiteP(Vdata);
           res.status(200).json({ message: 'Données de visite insérées avec succès', result });
         } catch (error) {
           console.error('Erreur lors de l\'insertion des données de visite :', error);
@@ -192,24 +192,38 @@ class AgentControl{
             res.status(500).send('Erreur lors de la suppression de la visite');
         }
     }
-    static async getVisitesDuJour(req, res) {
+    static async getVisitesDuJourP(req, res) {
         try {
             const Date= req.body.Date;
-          const visites = await agent.getVisitesDuJour(Date); 
+          const visites = await agent.getVisitesPDuJour(Date); 
           res.status(200).json(visites);
         } catch (err) {
             console.log(err);
           res.status(500).json({ error: 'Erreur lors de la récupération des visites' });
         }
       }
-      static async modifierVisite(req, res) {
+      static async modifierVisiteP(req, res) {
         try {
             const visiteData = req.body; // Assurez-vous que toutes les données nécessaires sont envoyées dans le corps de la requête
-            const result = await agent.modifierVisite(visiteData);
+            const result = await agent.modifierVisiteP(visiteData);
             res.status(200).json({ message: 'Visite modifiée avec succès', result });
         } catch (err) {
             console.error("Erreur lors de la modification de la visite :", err);
             res.status(500).json({ error: 'Erreur lors de la modification de la visite' });
+        }
+    }
+
+   static async supprimerPrepareVisite(req, res) {
+        const IdP = req.params.IdP;
+        try {
+            const result = await agent.supprimerPrepareVisite(IdP);
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ message: 'Visite préparée non trouvée' });
+            }
+            res.status(200).json({ message: 'Visite préparée supprimée avec succès' });
+        } catch (error) {
+            console.error('Erreur lors de la suppression de la visite préparée :', error);
+            res.status(500).json({ error: 'Erreur lors de la suppression de la visite préparée' });
         }
     }
 }
