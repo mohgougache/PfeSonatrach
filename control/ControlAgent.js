@@ -137,14 +137,23 @@ class AgentControl{
        }
       static async deleteRdv(req,res){
         const IdR= req.params.IdR;
+        // const Date=req.body.Date;
+        try {
+        let date = await agent.getRendevousDate(IdR);
         let result = await agent.supRdv(IdR);
+        
         if(result){
-            res.json(result);
-           console.log(result);
+            
+            let data = await agent.getRendevous(date);
+            res.status(200).json({ message: 'rdv supprimé avec succès', data }); 
         }
         else {
             res.status(401).json({ error: "il ya problame dans la requit"})
         }
+    }catch (error) {
+        console.error("Erreur lors de la suppression de rdv :", error);
+        res.status(500).json({ error: "Erreur lors de la suppression de rdv" });
+      }
     
     } 
     static async updateRdv(req, res) {

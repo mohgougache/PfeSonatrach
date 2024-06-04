@@ -368,6 +368,18 @@ class AgentModule{
           });
       });
   }
+  static getRendevousDate(IdR) {
+    return new Promise(resolve => {
+        db.query("SELECT Date FROM rdv  WHERE IdR= ?", [IdR], (error, result) => {
+            if (!error) {
+                resolve(result[0].Date);
+            } else {
+                console.log(error);
+                resolve(error);
+            }
+        });
+    });
+}
   
     static  supRdv(IdR){
       return new Promise(resolve =>{
