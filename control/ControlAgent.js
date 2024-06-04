@@ -125,6 +125,7 @@ class AgentControl{
       }
       static async selcectRdv(req,res){
         const Date= req.body.Date
+        try {
         let results = await agent.getRendevous(Date);
         if(results){
             res.json(results);
@@ -133,7 +134,11 @@ class AgentControl{
         else {
             res.status(401).json({ error: "il ya problame dans la requit" });
           
-        }
+        }}
+        catch (error) {
+            console.error("Erreur lors de la sellecte de rdv :", error);
+            res.status(500).json({ error: "Erreur lors de la selction de rdv" });
+          }
        }
       static async deleteRdv(req,res){
         const IdR= req.params.IdR;
@@ -156,14 +161,19 @@ class AgentControl{
       }
     
     } 
-    static async updateRdv(req, res) {
+    static async updateRdv(req, res) { 
         const Data = {...req.body};  
+        try {
         let results = await agent.modifieRdv(Data); 
         if (results) {
             res.status(200).json({message:"bien modifie donne base de donne"});
         } else {
             res.status(401).json({ error: "Il y a un problème dans la requête" });
-        }
+        }}
+        catch (error) {
+            console.error("Erreur lors de la modifie de rdv :", error);
+            res.status(500).json({ error: "Erreur lors de la modifie de rdv" });
+          }
     }
     static async InsertCertificat(req, res) {
         const { TypeC, certificatData } = req.body;
