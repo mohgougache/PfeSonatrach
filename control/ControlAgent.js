@@ -4,6 +4,7 @@ import email from "../module/email.js";
 class AgentControl{
     
        static async selctALLagent(req,res){
+        try {
         let results = await agent.getagentall();
         if(results){
             res.json(results);
@@ -12,9 +13,12 @@ class AgentControl{
         else {
             res.status(401).json({ error: "il ya problame dans la requit" });
           
-        }
+        }}
+        catch (error) {
+            console.error("Erreur lors de la récupération de l'agent  :", error);
+            res.status(500).json({ error: "Erreur interne du serveur" });
        }
-
+    }
        static async selectAgent(req, res) {
         const IdA = req.body?.IdA;
         try {
@@ -30,7 +34,7 @@ class AgentControl{
         }
     }
        static async selctAgent2(req,res){
-        
+        try {
         let results = await agent.getAgent();
         if(results){
             res.status(200).json(results);
@@ -39,9 +43,12 @@ class AgentControl{
         else {
             res.status(401).json({ error: "il ya problame dans la requit" });
           
-        }
+        }}
+     catch (error) {
+        console.error("Erreur lors de la récupération de l'agent et des postes :", error);
+        res.status(500).json({ error: "Erreur interne du serveur" });
        }
-    
+       }
     static async InsertAgentAndPoste(req, res) {
 
         const agente ={...req.body.agent};
@@ -107,10 +114,11 @@ class AgentControl{
         console.log(req.body);
         const Data  ={... req.body};
         try {
-          const resultE = await agent.selectEmail(Data.IdA); // Appel de la méthode statique selectEmail
-          const resultI = await agent.insertRDV(Data); // Appel de la méthode statique insertRDV
+          const resultE = await agent.selectEmail(Data.IdA); 
+          const resultI = await agent.insertRDV(Data); 
           if (resultE && resultE.length > 0 && resultI) {
-            res.status(200).json({ resultE, resultI }); // Correction de la réponse JSON
+            let data = await agent.getRendevous(Data.Date);
+            res.status(200).json({ message: 'rdv insert avec succès', data }); 
             console.log(resultE);
             email.email(resultE[0].Email, "visite periodice", "control/mail.html"); // Appel correct de la méthode pour envoyer l'e-mail
           } else if (!resultE) {

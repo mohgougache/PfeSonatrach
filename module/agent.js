@@ -329,21 +329,28 @@ class AgentModule{
   
   
      
-      static selectEmail(IdA) {
-        return new Promise((resolve, reject) => {
-          db.query('SELECT Email FROM agent WHERE IdA = ?', [IdA], (error, result) => {
-            if (error) { 
-              console.error(error);
-              reject(error); // Rejeter la promesse en cas d'erreur
-            } else {
-              resolve(result); // Résoudre la promesse avec le résultat
-            }
-          });
+static async selectEmail(IdA) {
+    try {
+        const result = await new Promise((resolve, reject) => {
+            db.query('SELECT Email FROM agent WHERE IdA = ?', [IdA], (error, result) => {
+                if (error) {
+                    console.error(error);
+                    reject(error); // Rejeter la promesse en cas d'erreur
+                } else {
+                    resolve(result); // Résoudre la promesse avec le résultat
+                }
+            });
         });
-      } 
+        return result;
+    } catch (error) {
+        console.error("Erreur lors de la sélection de l'email :", error);
+        throw error; // Relancer l'erreur pour la gestion ultérieure
+    }
+}
 
-      static insertRDV(Data) { 
-        return new Promise((resolve, reject) => { 
+static async insertRDV(Data) {
+    try {
+        const result = await new Promise((resolve, reject) => {
             const query = 'INSERT INTO RDV (IdA, TypeRdv, Date, Heure) VALUES (?, ?, ?, ?)';
             db.query(query, [Data.IdA, Data.TypeRdv, Data.Date, Data.Heure], (error, result) => {
                 if (error) {
@@ -355,7 +362,12 @@ class AgentModule{
                 }
             });
         });
+        return result;
+    } catch (error) {
+        console.error("Erreur lors de l'insertion du RDV :", error);
+        throw error; // Relancer l'erreur pour la gestion ultérieure
     }
+}
     static getRendevous(Date) {
       return new Promise(resolve => {
           db.query("SELECT rdv.IdR,rdv.IdA,agent.Nom, agent.Prenom, agent.Email, rdv.Heure, rdv.TypeRdv FROM agent JOIN rdv ON agent.IdA = rdv.IdA WHERE rdv.Date = ?", [Date], (error, result) => {
