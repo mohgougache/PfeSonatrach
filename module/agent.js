@@ -435,11 +435,11 @@ static async insertRDV(Data) {
       );
     });
   } 
-  static getVisitesPDuJour(Date) {
+  static getVisitesPDuJour(date) {
     return new Promise((resolve, reject) => {
         const query = `
             SELECT
-            preparevisite.IdP,
+                preparevisite.IdP,
                 agent.Nom,
                 agent.Prenom,
                 agent.Email,
@@ -452,14 +452,14 @@ static async insertRDV(Data) {
                 preparevisite.IdR,
                 preparevisite.IdE,
                 preparevisite.Statut
-               
             FROM preparevisite
             JOIN rdv ON preparevisite.IdR = rdv.IdR
             JOIN agent ON rdv.IdA = agent.IdA
-            WHERE rdv.Date = ?
+            WHERE rdv.Date = ? 
         `;
-        db.query(query, [Date], (err, results) => {
+        db.query(query, [date], (err, results) => {
             if (err) {
+                console.error("Erreur lors de l'exécution de la requête :", err);
                 reject(err);
                 return;
             }
