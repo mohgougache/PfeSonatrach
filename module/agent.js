@@ -496,6 +496,26 @@ static modifierVisiteP(visiteData) {
         });
     });
 }
+
+static getDateVP(IdP) {
+    return new Promise((resolve, reject) => {
+        const query = `
+            SELECT
+                DATE_FORMAT(rdv.Date, '%Y/%m/%d') AS Date
+            FROM preparevisite
+            JOIN rdv ON preparevisite.IdR = rdv.IdR
+            WHERE preparevisite.IdP = ?
+        `;
+        db.query(query, [IdP], (err, results) => {
+            if (err) {
+                console.error("Erreur lors de l'exécution de la requête :", err);
+                reject(err);
+                return;
+            }
+            resolve(results);
+        });
+    });
+}
 static supprimerPrepareVisite(IdP) {
     return new Promise((resolve, reject) => {
         const query = 'DELETE FROM preparevisite WHERE IdP = ?';
@@ -510,4 +530,4 @@ static supprimerPrepareVisite(IdP) {
 }
 
 
-export default AgentModule ;
+export default AgentModule ; 

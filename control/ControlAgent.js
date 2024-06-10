@@ -212,6 +212,7 @@ class AgentControl{
         const IdV = req.params.id;
 
         try {
+            
             await agent.supVisite(IdV);
             res.send({ message: 'Visite supprimée avec succès' });
         } catch (err) {
@@ -221,7 +222,7 @@ class AgentControl{
     }
     static async getVisitesDuJourP(req, res) {
         try {
-            const date = req.body.Date;o
+            const date = req.body.Date;
             const visites = await agent.getVisitesPDuJour(date);
             console.log(visites);
             res.status(200).json({ visites });
@@ -232,7 +233,7 @@ class AgentControl{
     }
       static async modifierVisiteP(req, res) {
         try {
-            const visiteData = req.body.Date; // Assurez-vous que toutes les données nécessaires sont envoyées dans le corps de la requête
+            const visiteData = {...req.body}; // Assurez-vous que toutes les données nécessaires sont envoyées dans le corps de la requête
             const result = await agent.modifierVisiteP(visiteData);
             res.status(200).json({ message: 'Visite modifiée avec succès', result });
         } catch (err) {
@@ -241,14 +242,25 @@ class AgentControl{
         }
     }
 
-   static async supprimerPrepareVisite(req, res) {
+    static async supprimerPrepareVisite(req, res) {
         const IdP = req.params.IdP;
         try {
+            // Obtenir la date de la visite préparée
+            const dateResult = await agent.getDateVP(IdP);
+            if (dateResult.length === 0) {
+                return res.status(404).json({ message: 'Visite préparée non trouvée' });
+            }
+            const date = dateResult[0].Date;
+    
+            // Supprimer la visite préparée
             const result = await agent.supprimerPrepareVisite(IdP);
             if (result.affectedRows === 0) {
                 return res.status(404).json({ message: 'Visite préparée non trouvée' });
             }
-            res.status(200).json({ message: 'Visite préparée supprimée avec succès' });
+     
+            // Obtenir les visites du jour
+            const data = await agent.getVisitesPDuJour(date);
+            res.status(200).json({ message: 'Visite préparée supprimée avec succès', data });
         } catch (error) {
             console.error('Erreur lors de la suppression de la visite préparée :', error);
             res.status(500).json({ error: 'Erreur lors de la suppression de la visite préparée' });
