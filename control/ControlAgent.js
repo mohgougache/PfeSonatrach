@@ -51,8 +51,8 @@ class AgentControl{
        }
     static async InsertAgentAndPoste(req, res) {
 
-        const agente ={...req.body.agent};
-        const postes ={...req.body.poste};
+        const agente ={...req.body.agente};
+        const postes ={...req.body.postes};
         console.log(req.body);
         if (!agente || !postes) {
             return res.status(400).json({ error: "Les données de l'agent et du poste sont requises." });
@@ -73,7 +73,7 @@ class AgentControl{
     }
     
     static async updateAgentAndPoste(req, res) {
-        const agente ={...req.body.agent};
+        const agente ={...req.body.agente};
         const postes =[...req.body.postes];
         try { 
             
@@ -96,9 +96,10 @@ class AgentControl{
           const result = await agent.suppAgent(IdA);
           console.log("Résultat de suppAgent :", result); // Ajouté pour le débogage
           if (result) {
-            const data = await agent.getagentall();
+            const data = await agent.getAgentAll();
             res.status(200).json({ message: 'Agent supprimé avec succès', data }); 
           } else {
+            console.log(error);
             res.status(401).json({ error: "Erreur de suppression" });
           }
         } catch (error) {
@@ -243,17 +244,17 @@ class AgentControl{
     }
 
     static async supprimerPrepareVisite(req, res) {
-        const IdP = req.params.IdP;
+        const IdV = req.params.IdV;
         try {
             // Obtenir la date de la visite préparée
-            const dateResult = await agent.getDateVP(IdP);
+            const dateResult = await agent.getDateVP(IdV);
             if (dateResult.length === 0) {
                 return res.status(404).json({ message: 'Visite préparée non trouvée' });
             }
             const date = dateResult[0].Date;
     
             // Supprimer la visite préparée
-            const result = await agent.supprimerPrepareVisite(IdP);
+            const result = await agent.supprimerPrepareVisite(IdV);
             if (result.affectedRows === 0) {
                 return res.status(404).json({ message: 'Visite préparée non trouvée' });
             }

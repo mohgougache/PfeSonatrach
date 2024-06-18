@@ -4,20 +4,29 @@ import moment from 'moment';
 class AgentModule{
     
     
-    static async getagentall()
-    {
-     return new Promise(resolve =>{
-        db.query("SELECT IdA ,Nom, Prenom, Sex, DateN, Nss FROM agent  " ,[],(error,result)=>{
-            if(!error){
-                resolve(result)
-            }
-            if(error){
-                console.log(error);
-                 resolve(error);
-            }
-        })
-     })
-    }
+    
+        static getAgentAll() {
+          return new Promise((resolve, reject) => {
+            const query = `
+              SELECT 
+                IdA, 
+                Nom, 
+                Prenom, 
+                Sex, 
+                DATE_FORMAT(DateN, '%Y/%m/%d') AS DateN, 
+                Nss 
+              FROM agent
+            `;
+            db.query(query, [], (error, result) => {
+              if (error) {
+                console.error("Erreur lors de la récupération des agents : ", error);
+                reject(error); // Rejeter la promesse en cas d'erreur
+              } else {
+                resolve(result); // Résoudre la promesse avec le résultat
+              }
+            });
+          });
+        }
     static async getagent(IdA) {
         return new Promise((resolve, reject) => {
             const agentQuery = `
@@ -81,179 +90,211 @@ class AgentModule{
    
   
     static async ajouterAgentAndPoste(agentData, posteData) {
-      return new Promise((resolve, reject) => {
-          db.beginTransaction((err) => {
-              if (err) {
-                  return reject(err);
-              }
-  
-              const agentInsertSql = `INSERT INTO agent 
-                  (Division, Direction, Unite, Service, Atelier, Nom, Prenom, DateN, LieuN, Sex, Email, SitutionFamille, Adreese, GroupeSanguim, Allergie, Nss, Scolaire, Professionnelle, Qprofessionnelle, ActiProAntet, ServiceNational) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-  
-              db.query(agentInsertSql, [
-                  agentData.Division, agentData.Direction, agentData.Unite, agentData.Service, agentData.Atelier, agentData.Nom, agentData.Prenom, agentData.DateN, agentData.LieuN, agentData.Sex, agentData.Email, agentData.SitutionFamille, agentData.Adreese, agentData.GroupeSanguim, agentData.Allergie, agentData.Nss, agentData.Scolaire, agentData.Professionnelle, agentData.Qprofessionnelle, agentData.ActiProAntet, agentData.ServiceNational
-              ], (error, agentResult) => {
-                  if (error) {
-                      return db.rollback(() => {
-                          reject(error);
-                      });
-                  }
-  
-                  const postInsertSql = 'INSERT INTO postes (Poste, DateD, DateF, RisqueProfess, Motifs, IdA) VALUES (?, ?, ?, ?, ?, ?)';
-  
-                  db.query(postInsertSql, [
-                      posteData.Poste, posteData.DateD, posteData.DateF, posteData.RisqueProfess, posteData.Motifs, agentResult.insertId
-                  ], (error, postResult) => {
-                      if (error) {
-                          return db.rollback(() => {
-                              reject(error);
-                          });
-                      }
-  
-                      db.commit((error) => {
-                          if (error) {
-                              return db.rollback(() => {
-                                  reject(error);
-                              });
-                          }
-                          resolve({ agent: agentResult, post: postResult });
-                      });
-                  });
-              }); 
-          });
-      });
-  }
-  static async ModifieAgentAndPoste(agentData, postesData) { 
-    return new Promise((resolve, reject) => {
-      db.beginTransaction((err) => {
-        if (err) {
-          return reject(err);
-        }
-  
-        const agentUpdateSql = 'UPDATE agent SET ? WHERE IdA = ?';
-        db.query(agentUpdateSql, [agentData, agentData.IdA], (error, agentResult) => {
-          if (error) {
-            return db.rollback(() => {
-              reject(error);
-            });
-          }
-  
-          // Vérification que postesData est un tableau
-          if (!Array.isArray(postesData)) {
-            return db.rollback(() => {
-              reject(new TypeError('postesData should be an array'));
-            });
-          }
-  
-          // Suppression de tous les anciens postes avant d'insérer les nouveaux
-          const deletePostesSql = 'DELETE FROM postes WHERE IdA = ?';
-          db.query(deletePostesSql, [agentData.IdA], (error, deleteResult) => {
-            if (error) {
-              return db.rollback(() => {
-                reject(error);
-              });
-            }
-  
-            // Insertion des nouveaux postes
-            const postInsertPromises = postesData.map(poste => {
-              return new Promise((resolve, reject) => {
-                const postInsertSql = 'INSERT INTO postes SET ?';
-                const postData = { ...poste, IdA: agentData.IdA };
-                db.query(postInsertSql, postData, (error, postResult) => {
-                  if (error) {
-                    console.log('Error inserting post:', error);
-                    return reject(error);
-                  }
-                  resolve(postResult);
-                });
-              });
-            });
-  
-            Promise.all(postInsertPromises)
-              .then(results => {
-                db.commit((commitError) => {
-                  if (commitError) {
-                    return db.rollback(() => {
-                      reject(commitError);
+        return new Promise((resolve, reject) => {
+            db.beginTransaction((err) => {
+                if (err) {
+                    return reject(err);
+                }
+    
+                const agentInsertSql = `INSERT INTO agent 
+                    (Division, Direction, Unite, Service, Atelier, Nom, Prenom, DateN, LieuN, Sex, Email, SitutionFamille, Adreese, GroupeSanguim, Allergie, Nss, Scolaire, Professionnelle, Qprofessionnelle, ActiProAntet, ServiceNational) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    
+                db.query(agentInsertSql, [
+                    agentData.Division, agentData.Direction, agentData.Unite, agentData.Service, agentData.Atelier, agentData.Nom, agentData.Prenom, agentData.DateN, agentData.LieuN, agentData.Sex, agentData.Email, agentData.SitutionFamille, agentData.Adreese, agentData.GroupeSanguim, agentData.Allergie, agentData.Nss, agentData.Scolaire, agentData.Professionnelle, agentData.Qprofessionnelle, agentData.ActiProAntet, agentData.ServiceNational
+                ], (error, agentResult) => {
+                    if (error) {
+                        return db.rollback(() => {
+                            reject(error);
+                        });
+                    }
+    
+                    const postInsertSql = 'INSERT INTO postes (Poste, RisqueProfess,IdA) VALUES (?, ?,?)';
+    
+                    db.query(postInsertSql, [
+                        posteData.Poste, posteData.RisqueProfess,agentResult.insertId
+                    ], (error, postResult) => {
+                        if (error) {
+                            return db.rollback(() => {
+                                reject(error);
+                            });
+                        }
+    
+                        const mutitionInsertSql = 'INSERT INTO mutitionposte (Motifs, DateD, DateF, IdA, IdP) VALUES (?, ?, ?, ?, ?)';
+    
+                        db.query(mutitionInsertSql, [
+                            posteData.Motifs, posteData.DateD, posteData.DateF, agentResult.insertId, postResult.insertId
+                        ], (error, mutitionResult) => {
+                            if (error) {
+                                return db.rollback(() => {
+                                    reject(error);
+                                });
+                            }
+    
+                            db.commit((error) => {
+                                if (error) {
+                                    return db.rollback(() => {
+                                        reject(error);
+                                    });
+                                }
+                                resolve({ agent: agentResult, post: postResult, mutition: mutitionResult });
+                            });
+                        });
                     });
-                  }
-                  resolve({ agent: agentResult, postes: results });
                 });
-              })
-              .catch(error => {
-                db.rollback(() => {
-                  reject(error);
-                });
-              });
-          });
+            });
         });
-      });
-    });
-  }
+    }
+    
+    static ModifieAgentAndPoste(agentData, postesData) {
+        return new Promise((resolve, reject) => {
+            db.beginTransaction(async (err) => {
+                if (err) {
+                    return reject(err);
+                }
+    
+                try {
+                    // Mettre à jour l'agent
+                    const agentUpdateSql = 'UPDATE agent SET ? WHERE IdA = ?';
+                    db.query(agentUpdateSql, [agentData, agentData.IdA], async (error, agentResult) => {
+                        if (error) {
+                            return db.rollback(() => {
+                                reject(error);
+                            });
+                        }
+    
+                        // Vérification que postesData est un tableau
+                        if (!Array.isArray(postesData)) {
+                            return db.rollback(() => {
+                                reject(new TypeError('postesData should be an array'));
+                            });
+                        }
+    
+                        // Suppression de toutes les anciennes mutations
+                        const deleteMutationsSql = 'DELETE FROM mutitionposte WHERE IdA = ?';
+                        db.query(deleteMutationsSql, [agentData.IdA], async (error, deleteMutationResult) => {
+                            if (error) {
+                                return db.rollback(() => {
+                                    reject(error);
+                                });
+                            }
+    
+                            // Suppression de tous les anciens postes
+                            const deletePostesSql = 'DELETE FROM postes WHERE IdA = ?';
+                            db.query(deletePostesSql, [agentData.IdA], async (error, deletePostesResult) => {
+                                if (error) {
+                                    return db.rollback(() => {
+                                        reject(error);
+                                    });
+                                }
+    
+                                // Insertion des nouveaux postes
+                                const insertionPromises = postesData.map((posteData) => {
+                                    return new Promise((resolve, reject) => {
+                                        const postInsertSql = 'INSERT INTO postes (Poste, RisqueProfess, IdA) VALUES (?, ?, ?)';
+                                        db.query(postInsertSql, [posteData.Poste, posteData.RisqueProfess, agentData.IdA], (error, postResult) => {
+                                            if (error) {
+                                                console.log('Error inserting post:', error);
+                                                return reject(error);
+                                            }
+                                            const IdP = postResult.insertId;
+    
+                                            const mutationInsertSql = 'INSERT INTO mutitionposte (Motifs, DateD, DateF, IdA, IdP) VALUES (?, ?, ?, ?, ?)';
+                                            db.query(mutationInsertSql, [posteData.Motifs, posteData.DateD, posteData.DateF, agentData.IdA, IdP], (error, mutationResult) => {
+                                                if (error) {
+                                                    console.log('Error inserting mutation:', error);
+                                                    return reject(error);
+                                                }
+                                                resolve({ IdP, posteData });
+                                            });
+                                        });
+                                    });
+                                });
+    
+                                // Exécution de toutes les promesses d'insertion
+                                Promise.all(insertionPromises)
+                                    .then((results) => {
+                                        // Valider la transaction
+                                        db.commit((commitError) => {
+                                            if (commitError) {
+                                                return db.rollback(() => {
+                                                    reject(commitError);
+                                                });
+                                            }
+                                            resolve({ agent: agentResult, insertions: results });
+                                        });
+                                    })
+                                    .catch((error) => {
+                                        db.rollback(() => {
+                                            reject(error);
+                                        });
+                                    });
+                            });
+                        });
+                    });
+                } catch (error) {
+                    db.rollback(() => {
+                        reject(error);
+                    });
+                }
+            });
+        });
+    }
+    
+    
+    
   
-    static getVisitesByAgentId(agentId) {
-      return new Promise((resolve, reject) => {
-          db.query('SELECT IdV FROM visite WHERE IdA = ?', [agentId], (err, results) => {
-              if (err) {
-                  return reject(err);
-              }
-              resolve(results);
-          });
-      });
-  }
+//   static supVisite(id) {
+//       return new Promise((resolve, reject) => {
+//           db.beginTransaction((err) => {
+//               if (err) {
+//                   return reject(err);
+//               }
   
-  static supVisite(id) {
-      return new Promise((resolve, reject) => {
-          db.beginTransaction((err) => {
-              if (err) {
-                  return reject(err);
-              }
+//               const tables = [
+//                   'cadiovasculaire', 'respiratoire', 'neuropsychisme', 'opht', 'orl',
+//                   'peaumuqueuses', 'explorationsfonctionnelles', 'genitourinaire',
+//                   'hematogg', 'locomoteur', 'digestif', 'endocrino', 'exemenscomplementaires'
+//               ];
   
-              const tables = [
-                  'cadiovasculaire', 'respiratoire', 'neuropsychisme', 'opht', 'orl',
-                  'peaumuqueuses', 'explorationsfonctionnelles', 'genitourinaire',
-                  'hematogg', 'locomoteur', 'digestif', 'endocrino', 'exemenscomplementaires'
-              ];
+//               let deleteFromTablePromises = tables.map((table) => {
+//                   return new Promise((resolve, reject) => {
+//                       db.query(`DELETE FROM ${table} WHERE IdV = ?`, [id], (err, result) => {
+//                           if (err) {
+//                               return reject(err);
+//                           }
+//                           resolve(result);
+//                       });
+//                   });
+//               });
   
-              let deleteFromTablePromises = tables.map((table) => {
-                  return new Promise((resolve, reject) => {
-                      db.query(`DELETE FROM ${table} WHERE IdV = ?`, [id], (err, result) => {
-                          if (err) {
-                              return reject(err);
-                          }
-                          resolve(result);
-                      });
-                  });
-              });
+//               Promise.all(deleteFromTablePromises)
+//                   .then(() => {
+//                       db.query('DELETE FROM visite WHERE IdV = ?', [id], (err, result) => {
+//                           if (err) {
+//                               return db.rollback(() => {
+//                                   reject(err);
+//                               });
+//                           }
   
-              Promise.all(deleteFromTablePromises)
-                  .then(() => {
-                      db.query('DELETE FROM visite WHERE IdV = ?', [id], (err, result) => {
-                          if (err) {
-                              return db.rollback(() => {
-                                  reject(err);
-                              });
-                          }
-  
-                          db.commit((err) => {
-                              if (err) {
-                                  return db.rollback(() => {
-                                      reject(err);
-                                  });
-                              }
-                              resolve(result);
-                          });
-                      });
-                  })
-                  .catch((err) => {
-                      db.rollback(() => {
-                          reject(err);
-                      });
-                  });
-          });
-      });
-  }
+//                           db.commit((err) => {
+//                               if (err) {
+//                                   return db.rollback(() => {
+//                                       reject(err);
+//                                   });
+//                               }
+//                               resolve(result);
+//                           });
+//                       });
+//                   })
+//                   .catch((err) => {
+//                       db.rollback(() => {
+//                           reject(err);
+//                       });
+//                   });
+//           });
+//       });
+//   }
   
   static async suppAgent(agentId) {
     return new Promise((resolve, reject) => {
@@ -263,15 +304,15 @@ class AgentModule{
             }
 
             try {
-                // Récupérer les visites associées à l'agent
-                const visites = await this.getVisitesByAgentId(agentId);
+                const mutitionposteResult = await new Promise((resolve, reject) => {
+                    db.query('DELETE FROM mutitionposte WHERE IdA = ?', [agentId], (err, result) => {
+                        if (err) {
+                            return reject(err);
+                        }
+                        resolve(result);
+                    });
+                });
 
-                // Supprimer chaque visite associée à l'agent
-                for (let visite of visites) {
-                    await this.supVisite(visite.IdV);
-                }
-
-                // Supprimer les entrées dans 'postes' associées à l'agent
                 const postesResult = await new Promise((resolve, reject) => {
                     db.query('DELETE FROM postes WHERE IdA = ?', [agentId], (err, result) => {
                         if (err) {
@@ -290,6 +331,8 @@ class AgentModule{
                         resolve(result);
                     });
                 });
+
+                
 
                 // Supprimer l'agent
                 const agentResult = await new Promise((resolve, reject) => {
@@ -393,19 +436,50 @@ static async insertRDV(Data) {
     });
 }
   
-    static  supRdv(IdR){
-      return new Promise(resolve =>{
-        db.query("DELETE FROM rdv WHERE IdR = ? " ,[IdR],(error,result)=>{
-          if(!error){
-              resolve(result)
+static supRdv(IdR) {
+    return new Promise((resolve, reject) => {
+      // Début de la transaction
+      db.beginTransaction(err => {
+        if (err) {
+          console.error("Erreur lors du démarrage de la transaction : ", err);
+          return reject(err);
+        }
+
+        // Suppression des visites associées
+        db.query("DELETE FROM visite WHERE IdR = ?", [IdR], (error, result) => {
+          if (error) {
+            console.error("Erreur lors de la suppression des visites : ", error);
+            return db.rollback(() => {
+              reject(error);
+            });
           }
-          if(error){
-              console.log(error);
-               resolve(error);
-          }
-      })
-      })
-    }
+
+          // Suppression du rendez-vous
+          db.query("DELETE FROM rdv WHERE IdR = ?", [IdR], (error, result) => {
+            if (error) {
+              console.error("Erreur lors de la suppression du RDV : ", error);
+              return db.rollback(() => {
+                reject(error);
+              });
+            }
+
+            // Validation de la transaction
+            db.commit(err => {
+              if (err) {
+                console.error("Erreur lors de la validation de la transaction : ", err);
+                return db.rollback(() => {
+                  reject(err);
+                });
+              }
+              resolve(result);
+            });
+          });
+        });
+      });
+    });
+  }
+
+
     static modifieRdv(RdvData) {
       return new Promise((resolve, reject) => {
           db.query("UPDATE rdv SET ? WHERE IdR = ?", [RdvData, RdvData.IdR], (error, result) => {
@@ -421,7 +495,7 @@ static async insertRDV(Data) {
   static insererVisiteP(Vdata) {
     return new Promise((resolve, reject) => {
       db.query(
-        'INSERT INTO preparevisite ( `Poids`,`Taille`, `Pt`,  `IdE`,`IdR`,Statut) VALUES (?,  ?, ?, ?, ?,1)', 
+        'INSERT INTO visite ( `Poids`,`Taille`, `Pt`,  `IdE`,`IdR`,Statut) VALUES (?,  ?, ?, ?, ?,1)', 
         [Vdata.Poids, Vdata.Taille, Vdata.Pt, Vdata.IdE, Vdata.IdR], 
         (error, result) => {
           if (error) {
@@ -439,21 +513,21 @@ static async insertRDV(Data) {
     return new Promise((resolve, reject) => {
         const query = `
             SELECT
-                preparevisite.IdP,
+                visite.IdV,
                 agent.Nom,
                 agent.Prenom,
                 agent.Email,
                 DATE_FORMAT(rdv.Date, '%Y/%m/%d') AS Date,
                 rdv.TypeRdv,
                 rdv.Heure,
-                preparevisite.Poids,
-                preparevisite.Taille,
-                preparevisite.Pt,
-                preparevisite.IdR,
-                preparevisite.IdE,
-                preparevisite.Statut
-            FROM preparevisite
-            JOIN rdv ON preparevisite.IdR = rdv.IdR
+                visite.Poids,
+                visite.Taille,
+                visite.Pt,
+                visite.IdR,
+                visite.IdE,
+                visite.Statut
+            FROM visite
+            JOIN rdv ON visite.IdR = rdv.IdR
             JOIN agent ON rdv.IdA = agent.IdA
             WHERE rdv.Date = ? 
         `;
@@ -470,13 +544,13 @@ static async insertRDV(Data) {
 static modifierVisiteP(visiteData) {
     return new Promise((resolve, reject) => {
         const query = `
-            UPDATE preparevisite SET 
+            UPDATE visite SET 
                 Poids = ?, 
                 Taille = ?, 
                 Pt = ?,  
                 IdR = ?, 
                 IdE = ?
-            WHERE IdP = ?
+            WHERE IdV = ?
         `;
         const values = [
             visiteData.Poids, 
@@ -497,16 +571,16 @@ static modifierVisiteP(visiteData) {
     });
 }
 
-static getDateVP(IdP) {
+static getDateVP(IdV) {
     return new Promise((resolve, reject) => {
         const query = `
             SELECT
                 DATE_FORMAT(rdv.Date, '%Y/%m/%d') AS Date
-            FROM preparevisite
-            JOIN rdv ON preparevisite.IdR = rdv.IdR
-            WHERE preparevisite.IdP = ?
+            FROM visite
+            JOIN rdv ON visite.IdR = rdv.IdR
+            WHERE visite.IdV = ?
         `;
-        db.query(query, [IdP], (err, results) => {
+        db.query(query, [IdV], (err, results) => {
             if (err) {
                 console.error("Erreur lors de l'exécution de la requête :", err);
                 reject(err);
@@ -516,10 +590,10 @@ static getDateVP(IdP) {
         });
     });
 }
-static supprimerPrepareVisite(IdP) {
+static supprimerPrepareVisite(IdV) {
     return new Promise((resolve, reject) => {
-        const query = 'DELETE FROM preparevisite WHERE IdP = ?';
-        db.query(query, [IdP], (err, result) => {
+        const query = 'DELETE FROM visite WHERE IdV = ?';
+        db.query(query, [IdV], (err, result) => {
             if (err) {
                 return reject(err);
             }
