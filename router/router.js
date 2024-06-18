@@ -40,6 +40,8 @@ router.post("/api/opht",controlD.insertopht);
 router.post("/api/orl",controlD.insertorl);
 router.post("/api/peaumuqueuses",controlD.insertpeaumuqueuses);
 router.post("/api/respiratoire",controlD.insertrespiratoire);
-
+router.post("/api/maladie",controlA.ajouterMaladies);
+router.get("/api/getmaladie",controlA.getColumns);
+ 
 export default router; 
  

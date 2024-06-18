@@ -5,7 +5,7 @@ class AgentControl{
     
        static async selctALLagent(req,res){
         try {
-        let results = await agent.getagentall();
+        let results = await agent.getAgentAll();
         if(results){
             res.json(results);
            console.log(results);
@@ -52,7 +52,7 @@ class AgentControl{
     static async InsertAgentAndPoste(req, res) {
 
         const agente ={...req.body.agente};
-        const postes ={...req.body.postes};
+        const postes =[...req.body.postes];
         console.log(req.body);
         if (!agente || !postes) {
             return res.status(400).json({ error: "Les données de l'agent et du poste sont requises." });
@@ -267,5 +267,29 @@ class AgentControl{
             res.status(500).json({ error: 'Erreur lors de la suppression de la visite préparée' });
         }
     }
+    static async ajouterMaladies(req, res) {
+        const { IdV, maladiesSelection } = req.body;
+
+        try {
+            const result = await agent.insertMaladies(IdV, maladiesSelection);
+            res.json({ message: "Sélections de maladies ajoutées avec succès" });
+        } catch (error) {
+            console.error("Erreur lors de l'ajout des sélections de maladies :", error);
+            res.status(500).json({ error: "Erreur interne du serveur" });
+        }
+     }
+    
+     static async getColumns(req, res) {
+        try {
+            const columnNames = await agent.getAllColumnsExceptIds(); // Ajoutez les parenthèses pour appeler la méthode
+            res.status(200).json({ message: "Noms des colonnes récupérés avec succès", data: columnNames });
+        } catch (error) {
+            console.error("Erreur lors de la récupération des noms de colonnes :", error);
+            res.status(500).json({ error: "Erreur interne du serveur" });
+        }
+    }
+    
+    
+   
 }
   export default  AgentControl;

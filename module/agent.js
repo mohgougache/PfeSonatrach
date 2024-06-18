@@ -87,9 +87,7 @@ class AgentModule{
      })
     }
     
-   
-  
-    static async ajouterAgentAndPoste(agentData, posteData) {
+    static async ajouterAgentAndPoste(agentData, postesData) {
         return new Promise((resolve, reject) => {
             db.beginTransaction((err) => {
                 if (err) {
@@ -109,42 +107,52 @@ class AgentModule{
                         });
                     }
     
-                    const postInsertSql = 'INSERT INTO postes (Poste, RisqueProfess,IdA) VALUES (?, ?,?)';
-    
-                    db.query(postInsertSql, [
-                        posteData.Poste, posteData.RisqueProfess,agentResult.insertId
-                    ], (error, postResult) => {
-                        if (error) {
-                            return db.rollback(() => {
-                                reject(error);
-                            });
-                        }
-    
-                        const mutitionInsertSql = 'INSERT INTO mutitionposte (Motifs, DateD, DateF, IdA, IdP) VALUES (?, ?, ?, ?, ?)';
-    
-                        db.query(mutitionInsertSql, [
-                            posteData.Motifs, posteData.DateD, posteData.DateF, agentResult.insertId, postResult.insertId
-                        ], (error, mutitionResult) => {
-                            if (error) {
-                                return db.rollback(() => {
-                                    reject(error);
-                                });
-                            }
-    
-                            db.commit((error) => {
+                    // Insertion des nouveaux postes
+                    const insertionPromises = postesData.map((posteData) => {
+                        return new Promise((resolve, reject) => {
+                            const postInsertSql = 'INSERT INTO postes (Poste, RisqueProfess, IdA) VALUES (?, ?, ?)';
+                            db.query(postInsertSql, [posteData.Poste, posteData.RisqueProfess, agentResult.insertId], (error, postResult) => {
                                 if (error) {
-                                    return db.rollback(() => {
-                                        reject(error);
-                                    });
+                                    console.log('Error inserting post:', error);
+                                    return reject(error);
                                 }
-                                resolve({ agent: agentResult, post: postResult, mutition: mutitionResult });
+    
+                                const IdP = postResult.insertId;
+                                const mutationInsertSql = 'INSERT INTO mutitionposte (Motifs, DateD, DateF, IdA, IdP) VALUES (?, ?, ?, ?, ?)';
+                                db.query(mutationInsertSql, [posteData.Motifs, posteData.DateD, posteData.DateF, agentResult.insertId, IdP], (error, mutationResult) => {
+                                    if (error) {
+                                        console.log('Error inserting mutation:', error);
+                                        return reject(error);
+                                    }
+                                    resolve({ IdP, posteData });
+                                });
                             });
                         });
                     });
+    
+                    // Exécution de toutes les promesses d'insertion
+                    Promise.all(insertionPromises)
+                        .then((results) => {
+                            // Valider la transaction
+                            db.commit((commitError) => {
+                                if (commitError) {
+                                    return db.rollback(() => {
+                                        reject(commitError);
+                                    });
+                                }
+                                resolve({ agent: agentResult, insertions: results });
+                            });
+                        })
+                        .catch((error) => {
+                            db.rollback(() => {
+                                reject(error);
+                            });
+                        });
                 });
             });
         });
     }
+    
     
     static ModifieAgentAndPoste(agentData, postesData) {
         return new Promise((resolve, reject) => {
@@ -598,6 +606,55 @@ static supprimerPrepareVisite(IdV) {
                 return reject(err);
             }
             resolve(result);
+        });
+    });
+}
+
+static async insertMaladies(IdV, maladiesSelection) {
+    return new Promise((resolve, reject) => {
+        try {
+            // Construire la requête d'insertion
+            const query = `
+                INSERT INTO maladie
+                (\`Covid-19\`, Denque, Grippe, IdV)
+                VALUES (?, ?, ?, ?)
+            `;
+
+            // Exécuter la requête avec les valeurs de maladies sélectionnées
+            db.query(query, [
+                maladiesSelection.includes('Covid-19') ? 1 : 0,
+                maladiesSelection.includes('Denque') ? 1 : 0,
+                maladiesSelection.includes('Grippe') ? 1 : 0,
+                IdV
+            ], (error, result) => {
+                if (error) {
+                    console.error("Erreur ajouter des sélections de maladies :", error);
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
+        } catch (error) {
+            console.error("Erreur ajouter des sélections de maladies :", error);
+            reject(error);
+        }
+    });
+}
+static getAllColumnsExceptIds() {
+    return new Promise((resolve, reject) => {
+        const query = `
+            SELECT COLUMN_NAME
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_NAME = 'maladie'
+            AND COLUMN_NAME NOT IN ('IdM', 'IdV')
+        `;
+        db.query(query, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                const columnNames = result.map(row => row.COLUMN_NAME);
+                resolve(columnNames);
+            }
         });
     });
 }
