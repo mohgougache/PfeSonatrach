@@ -199,16 +199,19 @@ class AgentControl{
         }
     }
     static async insererVisiteP(req, res) {
-        const Vdata ={...req.body};
+        const Vdata = { ...req.body };
         console.log(Vdata);
+    
         try {
-          const result = await agent.insererVisiteP(Vdata);
+          const IdV = await agent.generateIdV(Vdata.IdR);
+          const result = await agent.insererVisiteP(Vdata, IdV);
           res.status(200).json({ message: 'Données de visite insérées avec succès', result });
         } catch (error) {
           console.error('Erreur lors de l\'insertion des données de visite :', error);
           res.status(500).json({ error: 'Erreur lors de l\'insertion des données de visite' });
         }
-      } 
+      }
+      
       static async deleteVisite(req, res) {
         const IdV = req.params.id;
 
@@ -239,7 +242,7 @@ class AgentControl{
             res.status(200).json({ message: 'Visite modifiée avec succès', result });
         } catch (err) {
             console.error("Erreur lors de la modification de la visite :", err);
-            res.status(500).json({ error: 'Erreur lors de la modification de la visite' });
+            res.status(500).json({ error: 'Erreur lors de la modification de la visite' }); 
         }
     }
 

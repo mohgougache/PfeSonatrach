@@ -95,11 +95,11 @@ class AgentModule{
                 }
     
                 const agentInsertSql = `INSERT INTO agent 
-                    (Division, Direction, Unite, Service, Atelier, Nom, Prenom, DateN, LieuN, Sex, Email, SitutionFamille, Adreese, GroupeSanguim, Allergie, Nss, Scolaire, Professionnelle, Qprofessionnelle, ActiProAntet, ServiceNational) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                    (IdA,Division, Direction, Unite, Service, Atelier, Nom, Prenom, DateN, LieuN, Sex, Email, SitutionFamille, Adreese, GroupeSanguim, Allergie, Nss, Scolaire, Professionnelle, Qprofessionnelle, ActiProAntet, ServiceNational) 
+                    VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     
                 db.query(agentInsertSql, [
-                    agentData.Division, agentData.Direction, agentData.Unite, agentData.Service, agentData.Atelier, agentData.Nom, agentData.Prenom, agentData.DateN, agentData.LieuN, agentData.Sex, agentData.Email, agentData.SitutionFamille, agentData.Adreese, agentData.GroupeSanguim, agentData.Allergie, agentData.Nss, agentData.Scolaire, agentData.Professionnelle, agentData.Qprofessionnelle, agentData.ActiProAntet, agentData.ServiceNational
+                    agentData.IdA,agentData.Division, agentData.Direction, agentData.Unite, agentData.Service, agentData.Atelier, agentData.Nom, agentData.Prenom, agentData.DateN, agentData.LieuN, agentData.Sex, agentData.Email, agentData.SitutionFamille, agentData.Adreese, agentData.GroupeSanguim, agentData.Allergie, agentData.Nss, agentData.Scolaire, agentData.Professionnelle, agentData.Qprofessionnelle, agentData.ActiProAntet, agentData.ServiceNational
                 ], (error, agentResult) => {
                     if (error) {
                         return db.rollback(() => {
@@ -111,7 +111,7 @@ class AgentModule{
                     const insertionPromises = postesData.map((posteData) => {
                         return new Promise((resolve, reject) => {
                             const postInsertSql = 'INSERT INTO postes (Poste, RisqueProfess, IdA) VALUES (?, ?, ?)';
-                            db.query(postInsertSql, [posteData.Poste, posteData.RisqueProfess, agentResult.insertId], (error, postResult) => {
+                            db.query(postInsertSql, [posteData.Poste, posteData.RisqueProfess, agentData.IdA], (error, postResult) => {
                                 if (error) {
                                     console.log('Error inserting post:', error);
                                     return reject(error);
@@ -119,7 +119,7 @@ class AgentModule{
     
                                 const IdP = postResult.insertId;
                                 const mutationInsertSql = 'INSERT INTO mutitionposte (Motifs, DateD, DateF, IdA, IdP) VALUES (?, ?, ?, ?, ?)';
-                                db.query(mutationInsertSql, [posteData.Motifs, posteData.DateD, posteData.DateF, agentResult.insertId, IdP], (error, mutationResult) => {
+                                db.query(mutationInsertSql, [posteData.Motifs, posteData.DateD, posteData.DateF, agentData.IdA, IdP], (error, mutationResult) => {
                                     if (error) {
                                         console.log('Error inserting mutation:', error);
                                         return reject(error);
@@ -500,23 +500,60 @@ static supRdv(IdR) {
           });
       });
   }
-  static insererVisiteP(Vdata) {
+  static insererVisiteP(Vdata, IdV) {
     return new Promise((resolve, reject) => {
-      db.query(
-        'INSERT INTO visite ( `Poids`,`Taille`, `Pt`,  `IdE`,`IdR`,Statut) VALUES (?,  ?, ?, ?, ?,1)', 
-        [Vdata.Poids, Vdata.Taille, Vdata.Pt, Vdata.IdE, Vdata.IdR], 
-        (error, result) => {
-          if (error) {
-            console.error("Erreur lors de l'insertion des données de visite :", error);
-            reject(error);
-          } else {
-            console.log("Données de visite insérées avec succès :", result); 
-            resolve(result);
-          }
-        }
-      );
+        const query = 'INSERT INTO visite (`IdV`, `Poids`, `Taille`, `Pt`, `IdE`, `IdR`, `Statut`) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        const values = [IdV, Vdata.Poids, Vdata.Taille, Vdata.Pt, Vdata.IdE, Vdata.IdR, 1]; // Assuming Vdata contains Poids, Taille, Pt, IdE, IdR
+
+        db.query(query, values, (error, result) => {
+            if (error) {
+                console.error('Erreur lors de l\'insertion des données de visite :', error);
+                reject(error);
+            } else {
+                console.log('Données de visite insérées avec succès :', result);
+                resolve(result);
+            }
+        });
     });
-  } 
+}
+
+static async generateIdV(IdR) {
+    return new Promise((resolve, reject) => {
+        const currentDate = new Date().toISOString().slice(0, 10); // Date actuelle au format YYYY-MM-DD
+        
+        // Récupérer l'heure actuelle en format HHMMSS
+        const currentTime = new Date().toISOString().slice(11, 19).replace(/:/g, ''); // Heure actuelle au format HHMMSS
+    
+        // Étape 1 : Récupérer le typerdv depuis la table rdv
+        const fetchTypeRdvQuery = 'SELECT typerdv FROM rdv WHERE IdR = ?';
+        db.query(fetchTypeRdvQuery, [IdR], (error, results) => {
+          if (error) {
+            console.error('Erreur lors de la récupération du typerdv :', error);
+            reject(error);
+          } else if (results.length === 0) {
+            reject(new Error('IdR non trouvé dans la table rdv'));
+          } else {
+            const typerdv = results[0].typerdv;
+    
+            // Étape 2 : Compter le nombre de visites pour aujourd'hui
+            const countVisitsQuery = 'SELECT COUNT(*) as visitCount FROM visite WHERE DATE(created_at) = CURDATE()';
+            db.query(countVisitsQuery, (error, results) => {
+              if (error) {
+                console.error('Erreur lors du comptage des visites pour aujourd\'hui :', error);
+                reject(error);
+              } else {
+                const visitCount = results[0].visitCount + 1; // Incrémenter pour obtenir le prochain numéro de visite pour aujourd'hui
+    
+                // Étape 3 : Générer IdV
+                const IdV = `${typerdv}${currentDate.replace(/-/g, '')}${visitCount}`;
+                resolve(IdV);
+              }
+            });
+          }
+        });
+      });
+    }
+  
   static getVisitesPDuJour(date) {
     return new Promise((resolve, reject) => {
         const query = `
@@ -555,7 +592,7 @@ static modifierVisiteP(visiteData) {
             UPDATE visite SET 
                 Poids = ?, 
                 Taille = ?, 
-                Pt = ?,  
+                Pt = ?, 
                 IdR = ?, 
                 IdE = ?
             WHERE IdV = ?
@@ -566,11 +603,12 @@ static modifierVisiteP(visiteData) {
             visiteData.Pt, 
             visiteData.IdR, 
             visiteData.IdE, 
-            visiteData.IdP
+            visiteData.IdV // Assuming IdV is correctly passed in visiteData
         ];
 
         db.query(query, values, (err, result) => {
             if (err) {
+                console.error('Erreur lors de la mise à jour de la visite :', err);
                 reject(err);
                 return;
             }
