@@ -49,21 +49,32 @@ class AgentControl{
         res.status(500).json({ error: "Erreur interne du serveur" });
        }
        }
-    static async InsertAgentAndPoste(req, res) {
-
-        const agente ={...req.body.agente};
-        const postes =[...req.body.postes];
+       static async InsertAgentAndPoste(req, res) {
+        const agentData = { ...req.body.agente };
+        const postesData = [ ...req.body.postes ];
         console.log(req.body);
-        if (!agente || !postes) {
+
+        if (!agentData || !postesData) {
             return res.status(400).json({ error: "Les données de l'agent et du poste sont requises." });
         }
-    
-        try { 
-            const result = await agent.ajouterAgentAndPoste(agente, postes);
+
+        // Valider la date de naissance
+        if (!agent.validateDate(agentData.DateN)) {
+            return res.status(400).json({ error: "La date de naissance est invalide." });
+        }
+
+        // Valider les dates de mutation pour chaque poste
+        for (const poste of postesData) {
+            if (!agent.validateDate(poste.DateD) || !agent.validateDate(poste.DateF)) {
+                return res.status(400).json({ error: `Les dates de mutation sont invalides pour le poste ${poste.Poste}.` });
+            }
+        }
+
+        try {
+            const result = await agent.ajouterAgentAndPoste(agentData, postesData);
             if (result) {
                 res.status(200).json({ message: 'Insertion réussie de l\'agent et du poste', result });
-            } else { 
-               
+            } else {
                 res.status(401).json({ error: "Erreur d'insertion" });
             }
         } catch (error) {
@@ -71,7 +82,6 @@ class AgentControl{
             res.status(500).json({ error: 'Erreur lors de l\'insertion de l\'agent et du poste', message: error.message });
         }
     }
-    
     static async updateAgentAndPoste(req, res) {
         const agente ={...req.body.agente};
         const postes =[...req.body.postes];
@@ -184,20 +194,20 @@ class AgentControl{
             res.status(500).json({ error: "Erreur lors de la modifie de rdv" });
           }
     }
-    static async InsertCertificat(req, res) {
-        const { TypeC, certificatData } = req.body;
-        try {
-            const result = await agent.AjouterCertificat(TypeC,certificatData);
-            if(result){
-                res.status(200).json({ message: 'Insert réussie de certificat ', result });
-            } else{
-                res.status(401).json({ error: "erreur de Insert " });
-            }
-        } catch (error) {
-            console.log( error);
-            res.status(500).json({ error: 'Erreur lors Insert certificat', message: error.message });
-        }
-    }
+    // static async InsertCertificat(req, res) {
+    //     const { TypeC, certificatData } = req.body;
+    //     try {
+    //         const result = await agent.AjouterCertificat(TypeC,certificatData);
+    //         if(result){
+    //             res.status(200).json({ message: 'Insert réussie de certificat ', result });
+    //         } else{
+    //             res.status(401).json({ error: "erreur de Insert " });
+    //         }
+    //     } catch (error) {
+    //         console.log( error);
+    //         res.status(500).json({ error: 'Erreur lors Insert certificat', message: error.message });
+    //     }
+    // }
     static async insererVisiteP(req, res) {
         const Vdata = { ...req.body };
         console.log(Vdata);
@@ -270,28 +280,57 @@ class AgentControl{
             res.status(500).json({ error: 'Erreur lors de la suppression de la visite préparée' });
         }
     }
-    static async ajouterMaladies(req, res) {
-        const { IdV, maladiesSelection } = req.body;
+   
+    
+     
+   static async ajouterMaladies(req, res) {
+        const maladie = {...req.body};
 
         try {
-            const result = await agent.insertMaladies(IdV, maladiesSelection);
-            res.json({ message: "Sélections de maladies ajoutées avec succès" });
+            const CodeM = maladie.LiberM.substring(0, 4).toLowerCase()
+            const newMaladie = await agent.maladie(CodeM,maladie);
+            res.status(201).json({ message: 'Maladie ajoutée avec succès', maladie: newMaladie });
         } catch (error) {
-            console.error("Erreur lors de l'ajout des sélections de maladies :", error);
-            res.status(500).json({ error: "Erreur interne du serveur" });
-        }
-     }
-    
-     static async getColumns(req, res) {
-        try {
-            const columnNames = await agent.getAllColumnsExceptIds(); // Ajoutez les parenthèses pour appeler la méthode
-            res.status(200).json({ message: "Noms des colonnes récupérés avec succès", data: columnNames });
-        } catch (error) {
-            console.error("Erreur lors de la récupération des noms de colonnes :", error);
-            res.status(500).json({ error: "Erreur interne du serveur" });
+            console.error('Erreur lors de l\'ajout de la maladie :', error);
+            res.status(500).json({ error: 'Erreur lors de l\'ajout de la maladie' });
         }
     }
-    
+    static async ajouterexamenbiologique (req, res) {
+        const biologique = {...req.body};
+
+        try {
+            const CodeB = biologique.LiberB.substring(0, 4).toLowerCase()
+            const examenbiologique = await agent.examenbiologique(CodeB,biologique);
+            res.status(201).json({ message: 'examenbiologique  ajoutée avec succès', examenbiologique: examenbiologique });
+        } catch (error) {
+            console.error('Erreur lors de l\'ajout de la examenbiologique  :', error);
+            res.status(500).json({ error: 'Erreur lors de l\'ajout de la examenbiologique' });
+        }
+    }
+    static async ajouteradio (req, res) {
+        const radio = {...req.body};
+
+        try {
+            const CodeX = radio.LiberX.substring(0, 4).toLowerCase()
+            const examenradio = await agent.examenradio(CodeX,radio);
+            res.status(201).json({ message: 'examenradio ajoutée avec succès', examenradio: examenradio });
+        } catch (error) {
+            console.error('Erreur lors de l\'ajout de la examenradio  :', error);
+            res.status(500).json({ error: 'Erreur lors de l\'ajout de la examenradio' });
+        }
+    }
+    static async ajoutermedicament (req, res) {
+        const medicament = {...req.body};
+
+        try {
+            const CodeMd = medicament.LiberMd.substring(0, 4).toLowerCase()
+            const medicaments = await agent.medicament(CodeMd,medicament);
+            res.status(201).json({ message: 'medicament ajoutée avec succès', medicament: medicaments });
+        } catch (error) {
+            console.error('Erreur lors de l\'ajout de la medicament  :', error);
+            res.status(500).json({ error: 'Erreur lors de l\'ajout de les medicament' });
+        }
+    }
     
    
 }

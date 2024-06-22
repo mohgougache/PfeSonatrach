@@ -153,6 +153,22 @@ class AgentModule{
         });
     }
     
+    static validateDate(dateStr) {
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/; // Format YYYY-MM-DD
+        if (!dateRegex.test(dateStr)) {
+            return false;
+        }
+
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const currentYear = new Date().getFullYear();
+        const currentDate = new Date();
+
+        if (month < 1 || month > 12 || day < 1 || day > 31 || year > currentYear || new Date(dateStr) > currentDate) {
+            return false;
+        }
+
+        return true;
+    }
     
     static ModifieAgentAndPoste(agentData, postesData) {
         return new Promise((resolve, reject) => {
@@ -533,8 +549,8 @@ static async generateIdV(IdR) {
           } else if (results.length === 0) {
             reject(new Error('IdR non trouvé dans la table rdv'));
           } else {
-            const typerdv = results[0].typerdv;
-    
+            const typerdv = results[0].typerdv.substring(0, 4).toLowerCase();
+    console.log(typerdv);
             // Étape 2 : Compter le nombre de visites pour aujourd'hui
             const countVisitsQuery = 'SELECT COUNT(*) as visitCount FROM visite WHERE DATE(created_at) = CURDATE()';
             db.query(countVisitsQuery, (error, results) => {
@@ -648,50 +664,71 @@ static supprimerPrepareVisite(IdV) {
     });
 }
 
-static async insertMaladies(IdV, maladiesSelection) {
-    return new Promise((resolve, reject) => {
-        try {
-            // Construire la requête d'insertion
-            const query = `
-                INSERT INTO maladie
-                (\`Covid-19\`, Denque, Grippe, IdV)
-                VALUES (?, ?, ?, ?)
-            `;
+static async maladie(CodeM,maladie) {
+   
+    const sql = `INSERT INTO maladie (CodeM, IdV, LiberM) VALUES (?,?, ?)`;
+    const values = [CodeM,maladie.IdV,maladie.LiberM];
 
-            // Exécuter la requête avec les valeurs de maladies sélectionnées
-            db.query(query, [
-                maladiesSelection.includes('Covid-19') ? 1 : 0,
-                maladiesSelection.includes('Denque') ? 1 : 0,
-                maladiesSelection.includes('Grippe') ? 1 : 0,
-                IdV
-            ], (error, result) => {
-                if (error) {
-                    console.error("Erreur ajouter des sélections de maladies :", error);
-                    reject(error);
-                } else {
-                    resolve(result);
-                }
-            });
-        } catch (error) {
-            console.error("Erreur ajouter des sélections de maladies :", error);
-            reject(error);
-        }
+    return new Promise((resolve, reject) => {
+        db.query(sql, values, (error, result) => {
+            if (error) {
+                console.error('Erreur lors de l\'insertion des données de maladie :', error);
+                reject(error);
+            } else {
+                console.log('maladie insérées avec succès :', result);
+                resolve(result);
+            }
+        });
     });
 }
-static getAllColumnsExceptIds() {
+
+static async examenbiologique (CodeB,biologique) {
+   
+    const sql = `INSERT INTO examenbiologique  (CodeB, IdV, LiberB) VALUES (?,?, ?)`;
+    const values = [CodeB,biologique.IdV,biologique.LiberB];
+
     return new Promise((resolve, reject) => {
-        const query = `
-            SELECT COLUMN_NAME
-            FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_NAME = 'maladie'
-            AND COLUMN_NAME NOT IN ('IdM', 'IdV')
-        `;
-        db.query(query, (err, result) => {
-            if (err) {
-                reject(err);
+        db.query(sql, values, (error, result) => {
+            if (error) {
+                console.error('Erreur lors de l\'insertion des données de examenbiologique :', error);
+                reject(error);
             } else {
-                const columnNames = result.map(row => row.COLUMN_NAME);
-                resolve(columnNames);
+                console.log('examenbiologique insérées avec succès :', result);
+                resolve(result);
+            }
+        });
+    });
+}
+static async examenradio (CodeX,radio) {
+   
+    const sql = `INSERT INTO examenradio  (CodeX, IdV, LiberX) VALUES (?,?, ?)`;
+    const values = [CodeX,radio.IdV,radio.LiberX];
+
+    return new Promise((resolve, reject) => {
+        db.query(sql, values, (error, result) => {
+            if (error) {
+                console.error('Erreur lors de l\'insertion des données de examenradio :', error);
+                reject(error);
+            } else {
+                console.log('examenradio insérées avec succès :', result);
+                resolve(result);
+            }
+        });
+    });
+}
+static async medicament (CodeMd,medicament) {
+   
+    const sql = `INSERT INTO medicament  (CodeMd, IdV, LiberMd) VALUES (?,?, ?)`;
+    const values = [CodeMd,medicament.IdV,medicament.LiberMd];
+
+    return new Promise((resolve, reject) => {
+        db.query(sql, values, (error, result) => {
+            if (error) {
+                console.error('Erreur lors de l\'insertion des données de medicament :', error);
+                reject(error);
+            } else {
+                console.log('medicament insérées avec succès :', result);
+                resolve(result);
             }
         });
     });

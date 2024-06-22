@@ -1,8 +1,9 @@
 import express from 'express';
 import controll from "../control/controlLogin.js";
 import controlA from "../control/ControlAgent.js";
-import controlC from "../control/controlCertafica.js";
-import controlD from  "../control/controlDossie.js"
+import controlD from  "../control/controlDossie.js";
+import PDFController  from "../control/PDFController.js";
+import Plan  from "../control/controlP.js";
 
 const router = express.Router();
 router.post("/api/profil", controll.ajouterProfil);
@@ -22,7 +23,6 @@ router.post("/api/convocation", controlA.envoyerEmailEtInsert);
 router.post("/api/selctRdv",controlA.selcectRdv); 
 router.delete("/api/suprdv/:IdR", controlA.deleteRdv);
 router.put("/api/modifRdv", controlA.updateRdv);
-router.post("/api/certificat", controlC.InsertCertificat);
 router.post("/api/visiteP", controlA.insererVisiteP);
 router.post("/api/visitePDeJour", controlA.getVisitesDuJourP);
 router.put("/api/modifierVisiteP", controlA.modifierVisiteP);
@@ -41,7 +41,12 @@ router.post("/api/orl",controlD.insertorl);
 router.post("/api/peaumuqueuses",controlD.insertpeaumuqueuses);
 router.post("/api/respiratoire",controlD.insertrespiratoire);
 router.post("/api/maladie",controlA.ajouterMaladies);
-router.get("/api/getmaladie",controlA.getColumns);
+router.post("/api/examenbiologique",controlA.ajouterexamenbiologique);
+router.post("/api/examenradio",controlA.ajouteradio);
+router.post("/api/medicament",controlA.ajoutermedicament);
+router.post('/api/ordordenence', PDFController.createPDF);
+router.get('/api/plan', Plan.getStatistics);
+
  
 export default router; 
  

@@ -4,30 +4,33 @@ import bcrypt from 'bcrypt';
 
 
 class logModele {
-  static async ajouterProfil(DataProfil,Password,IdE) {
-    try { 
-      const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(Password, salt); // Générer le hachage du mot de passe
-        console.log("Hachage du mot de passe :", hashedPassword); // Journal de débogage
+    static async ajouterProfil(DataProfil, Password, IdE) {
+        try {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(Password, salt);
+            console.log("Hachage du mot de passe :", hashedPassword); // Journal de débogage
 
-        const result = await new Promise((resolve, reject) => {
-            db.query('INSERT INTO profil (IdE, Nom, Prenom, Password,Email,Poste,statut) VALUES (?,?, ?, ?, ?,?,?)', 
-            [IdE, DataProfil.Nom, DataProfil.Prenom, hashedPassword,DataProfil.Email,DataProfil.Poste,1], (error, result) => {
-                if (error) {
-                    console.error("Erreur lors de l'insertion du profil :", error);
-                    reject(error); 
-                } else {
-                    console.log("2eme",hashedPassword);
-                    console.log("Profil inséré avec succès :", result);
-                    resolve({ affectedRows: result.affectedRows, insertId: result.insertId });
-                }
+            const result = await new Promise((resolve, reject) => {
+                const query = 'INSERT INTO profil (IdE, Nom, Prenom, Password, Email, Poste, statut) VALUES (?, ?, ?, ?, ?, ?, ?)';
+                const values = [IdE, DataProfil.Nom, DataProfil.Prenom, hashedPassword, DataProfil.Email, DataProfil.Poste, 1];
+
+                db.query(query, values, (error, result) => {
+                    if (error) {
+                        console.error("Erreur lors de l'insertion du profil :", error);
+                        reject(error);
+                    } else {
+                        console.log("Profil inséré avec succès :", result);
+                        resolve({ affectedRows: result.affectedRows, insertId: result.insertId });
+                    }
+                });
             });
-        });
-        return result; // Retourner le résultat de l'insertion
-    } catch (error) {
-        throw error;
+            return result; // Retourner le résultat de l'insertion
+        } catch (error) {
+            console.error("Erreur lors de l'ajout du profil :", error);
+            throw error;
+        }
     }
-}
+
 
 
 static async verifie(login) {
