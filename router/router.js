@@ -4,6 +4,7 @@ import controlA from "../control/ControlAgent.js";
 import controlD from  "../control/controlDossie.js";
 import PDFController  from "../control/PDFController.js";
 import Plan  from "../control/controlP.js";
+import stat  from "../control/staticMcontrol.js";
 
 const router = express.Router();
 router.post("/api/profil", controll.ajouterProfil);
@@ -45,7 +46,8 @@ router.post("/api/examenbiologique",controlA.ajouterexamenbiologique);
 router.post("/api/examenradio",controlA.ajouteradio);
 router.post("/api/medicament",controlA.ajoutermedicament);
 router.post('/api/ordordenence', PDFController.createPDF);
-router.get('/api/plan', Plan.getStatistics);
+router.get('/api/plan', Plan.getPlaning);
+router.post('/api/stat', stat.getMonthlyStatistics);
 
  
 export default router; 

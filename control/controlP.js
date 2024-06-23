@@ -1,10 +1,10 @@
 // planingController.js
-import planifingModel from '../module/planifing.js';
+
 import planingeModel from '../module/planifing.js'; // Assurez-vous du chemin correct vers votre modèle planingeModel
 
 class planingController {
    
-        static async getStatistics(req, res) {
+        static async getPlaning(req, res) {
             try {
                 const today = new Date().toISOString().split('T')[0]; // Format de la date : YYYY-MM-DD
     
@@ -18,12 +18,12 @@ class planingController {
                 const Visite  = await planingeModel.getDocumentCount(today);
 
                   // Récupérer le nombre de rendez-vous pour aujourd'hui
-                const  Rdv = await planifingModel.getRDVCount(today);
+                const  Rdv = await planingeModel.getRDVCount(today);
     
                 // Récupérer le nombre de rendez-vous par type pour aujourd'hui avec le pourcentage
-                const VisteType = await planifingModel.getRDVCountByType(today);
+                const VisteType = await planingeModel.getRDVCountByType(today);
 
-                const agentRDVDetails = await planifingModel.getAgentRDVDetails(today);
+                const agentRDVDetails = await planingeModel.getAgentRDVDetails(today);
     
                 res.status(200).json({
                     Agents,
