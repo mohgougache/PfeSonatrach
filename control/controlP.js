@@ -7,10 +7,10 @@ class planingController {
         static async getPlaning(req, res) {
             try {
                 const today = new Date().toISOString().split('T')[0]; // Format de la date : YYYY-MM-DD
-    
+                
                 // Récupérer le nombre d'agents
                 const  Agents = await planingeModel.getAgentCount();
-    
+                
                 // Récupérer le nombre de visites préparées pour aujourd'hui
                 const  PreparerVisite = await planingeModel.getVisitePreparedCount(today);
     
