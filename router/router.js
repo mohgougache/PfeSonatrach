@@ -43,12 +43,12 @@ router.post("/api/peaumuqueuses",controlD.insertpeaumuqueuses);
 router.post("/api/respiratoire",controlD.insertrespiratoire);
 router.post("/api/maladie",controlA.ajouterMaladies);
 router.post("/api/examenbiologique",controlA.ajouterexamenbiologique);
-router.post("/api/examenradio",controlA.ajouteradio);
+router.post("/api/examenradio",controlA.ajouterradio);
 router.post("/api/medicament",controlA.ajoutermedicament);
 router.post('/api/ordordenence', PDFController.createPDF);
 router.get('/api/plan', Plan.getPlaning);
 router.post('/api/stat', stat.getMonthlyStatistics);
 
  
-export default router; 
+export default router;  
  

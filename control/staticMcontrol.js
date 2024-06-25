@@ -12,11 +12,17 @@ class statictiController {
             const agentCount = await statisticModel.getAgentsWithVisitsCount(month, year);
             const rdvCount = await statisticModel.getRendezVousCount(month, year);
             const visiteCount = await statisticModel.getVisiteCount(month, year);
+            const maladie = await statisticModel.getDiseaseCountsM(month, year);
+            const examenradio = await statisticModel.getDiseaseCountsR(month, year);
+            const typeRdv = await statisticModel.getTypeRdvCounts(month, year);
 
             res.status(200).json({
                 agentCount,
                 rdvCount,
-                visiteCount
+                visiteCount,
+                maladie,
+                examenradio,
+                typeRdv
             });
         } catch (error) {
             console.error('Erreur lors de la récupération des statistiques mensuelles :', error);

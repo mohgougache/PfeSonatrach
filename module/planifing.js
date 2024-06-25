@@ -184,6 +184,37 @@ class planifingModel {
             });
         });
     }
+    static getAgentPeriodicVisits() {
+        return new Promise((resolve, reject) => {
+            const currentDate = new Date(); // Date actuelle
+        const threeMonthsAgo = new Date(currentDate);
+        threeMonthsAgo.setMonth(currentDate.getMonth() - 3);
+    
+            const query = `
+                SELECT 
+                    a.IdA,
+                    a.Nom,
+                    a.Prenom,
+                    a.Email,
+                    r.Typerdv
+                FROM 
+                    agent a
+                    JOIN rdv r ON a.IdA = r.IdA
+                    JOIN visite v ON r.IdR = v.IdR
+                WHERE 
+                    r.Typerdv = 'periodice'
+                    AND r.date = ?  
+                    AND v.Statut = 1`;
+    
+            db.query(query, [threeMonthsAgo], (error, rows) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(rows);
+                }
+            });
+        });
+    }
     
     
     

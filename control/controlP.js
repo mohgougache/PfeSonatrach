@@ -15,7 +15,7 @@ class planingController {
                 const  PreparerVisite = await planingeModel.getVisitePreparedCount(today);
     
                 // Récupérer le nombre de documents sortis pour aujourd'hui
-                const Visite  = await planingeModel.getDocumentCount(today);
+                const Visite  = await planingeModel.getDocumentCount(today); 
 
                   // Récupérer le nombre de rendez-vous pour aujourd'hui
                 const  Rdv = await planingeModel.getRDVCount(today);
@@ -24,6 +24,9 @@ class planingController {
                 const VisteType = await planingeModel.getRDVCountByType(today);
 
                 const agentRDVDetails = await planingeModel.getAgentRDVDetails(today);
+
+            const agentPeriodicVisits = await planingeModel.getAgentPeriodicVisits();
+
     
                 res.status(200).json({
                     Agents,
@@ -31,10 +34,11 @@ class planingController {
                     Visite ,
                     Rdv,
                     VisteType,
-                    agentRDVDetails
+                    agentRDVDetails,
+                    agentPeriodicVisits
                 });
             } catch (error) {
-                console.error('Erreur lors de la récupération des statistiques :', error);
+                console.error('Erreur lors de la récupération des planinge :', error);
                 res.status(500).json({ error: 'Erreur interne du serveur' });
             }
         }

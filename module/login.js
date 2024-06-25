@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 
 
 class logModele {
-    static async ajouterProfil(DataProfil, Password, IdE) {
+    static async ajouterProfil(DataProfil, Password) {
         try {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(Password, salt);
@@ -12,7 +12,7 @@ class logModele {
 
             const result = await new Promise((resolve, reject) => {
                 const query = 'INSERT INTO profil (IdE, Nom, Prenom, Password, Email, Poste, statut) VALUES (?, ?, ?, ?, ?, ?, ?)';
-                const values = [IdE, DataProfil.Nom, DataProfil.Prenom, hashedPassword, DataProfil.Email, DataProfil.Poste, 1];
+                const values = [DataProfil.IdE, DataProfil.Nom, DataProfil.Prenom, hashedPassword, DataProfil.Email, DataProfil.Poste, 1];
 
                 db.query(query, values, (error, result) => {
                     if (error) {

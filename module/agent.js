@@ -664,75 +664,96 @@ static supprimerPrepareVisite(IdV) {
     });
 }
 
-static async maladie(CodeM,maladie) {
-   
-    const sql = `INSERT INTO maladie (CodeM, IdV, LiberM) VALUES (?,?, ?)`;
-    const values = [CodeM,maladie.IdV,maladie.LiberM];
+static async maladie(CodeM, maladies, IdV) {
+    const sql = `INSERT INTO maladie (CodeM, IdV, LiberM) VALUES ?`;
+
+    // Construire un tableau de valeurs pour chaque maladie
+    const values = maladies.map(maladie => [
+        maladie.substring(0, 4).toLowerCase(),
+        IdV,
+        maladie
+    ]);
 
     return new Promise((resolve, reject) => {
-        db.query(sql, values, (error, result) => {
+        db.query(sql, [values], (error, result) => {
             if (error) {
                 console.error('Erreur lors de l\'insertion des données de maladie :', error);
                 reject(error);
             } else {
-                console.log('maladie insérées avec succès :', result);
+                console.log('Maladies insérées avec succès :', result);
                 resolve(result);
             }
         });
     });
 }
 
-static async examenbiologique (CodeB,biologique) {
-   
-    const sql = `INSERT INTO examenbiologique  (CodeB, IdV, LiberB) VALUES (?,?, ?)`;
-    const values = [CodeB,biologique.IdV,biologique.LiberB];
+
+static async examenbiologique(CodeB, biologiques, IdV) {
+    const sql = `INSERT INTO examenbiologique (CodeB, IdV, LiberB) VALUES ?`;
+
+    const values = biologiques.map(bio => [
+        bio.substring(0, 4).toLowerCase(),
+        IdV,
+        bio
+    ]);
 
     return new Promise((resolve, reject) => {
-        db.query(sql, values, (error, result) => {
+        db.query(sql, [values], (error, result) => {
             if (error) {
                 console.error('Erreur lors de l\'insertion des données de examenbiologique :', error);
                 reject(error);
             } else {
-                console.log('examenbiologique insérées avec succès :', result);
+                console.log('Examen biologiques insérés avec succès :', result);
                 resolve(result);
             }
         });
     });
 }
-static async examenradio (CodeX,radio) {
-   
-    const sql = `INSERT INTO examenradio  (CodeX, IdV, LiberX) VALUES (?,?, ?)`;
-    const values = [CodeX,radio.IdV,radio.LiberX];
+static async examenradio(CodeX, radios, IdV) {
+    const sql = `INSERT INTO examenradio (CodeX, IdV, LiberX) VALUES ?`;
+
+    const values = radios.map(radio => [
+        radio.substring(0, 4).toLowerCase(),
+        IdV,
+        radio
+    ]);
 
     return new Promise((resolve, reject) => {
-        db.query(sql, values, (error, result) => {
+        db.query(sql, [values], (error, result) => {
             if (error) {
                 console.error('Erreur lors de l\'insertion des données de examenradio :', error);
                 reject(error);
             } else {
-                console.log('examenradio insérées avec succès :', result);
+                console.log('Examens radiologiques insérés avec succès :', result);
                 resolve(result);
             }
         });
     });
 }
-static async medicament (CodeMd,medicament) {
-   
-    const sql = `INSERT INTO medicament  (CodeMd, IdV, LiberMd) VALUES (?,?, ?)`;
-    const values = [CodeMd,medicament.IdV,medicament.LiberMd];
+
+static async medicament(CodeMd, medicaments, IdV) {
+    const sql = `INSERT INTO medicament (CodeMd, IdV, LiberMd) VALUES ?`;
+
+    const values = medicaments.map(med => [
+        med.substring(0, 4).toLowerCase(),
+        IdV,
+        med
+    ]);
 
     return new Promise((resolve, reject) => {
-        db.query(sql, values, (error, result) => {
+        db.query(sql, [values], (error, result) => {
             if (error) {
                 console.error('Erreur lors de l\'insertion des données de medicament :', error);
                 reject(error);
             } else {
-                console.log('medicament insérées avec succès :', result);
+                console.log('Médicaments insérés avec succès :', result);
                 resolve(result);
             }
         });
     });
 }
+
+
 }
 
 
