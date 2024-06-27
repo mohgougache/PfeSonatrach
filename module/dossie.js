@@ -293,5 +293,6 @@ class DossieModule{
                 });
             });
         }
+       
 }
 export default DossieModule  ;

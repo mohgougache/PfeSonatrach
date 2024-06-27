@@ -8,7 +8,6 @@ class loginController {
 
         try {
             const Password = crypto.randomBytes(3).toString('hex');
-            
             console.log(Password);
             const result = await login.ajouterProfil(DataProfil,Password);
             const htmlContent = `
@@ -49,8 +48,6 @@ class loginController {
             console.log(error);
         }
     } 
-
-
     static async verficontrol(req, res) {
       console.log(req.body);
       const logine = { ...req.body };
@@ -82,7 +79,7 @@ class loginController {
         }
       }
     }
-  static async DeletProfil(req, res) {
+    static async DeletProfil(req, res) {
     const IdE = req.body.IdE;
 
     try {
@@ -98,17 +95,16 @@ class loginController {
         console.error("Erreur lors de la suppression du profil :", error);
         res.status(500).json({ error: "Erreur interne du serveur" });
     }
-}
-  static async getProfils(req, res) {
+    }
+    static async getProfils(req, res) {
     try {
         const profils = await login.getAllProfils();
         res.status(200).json({ success: true, data: profils });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Erreur lors de la récupération des profils.', error: error.message });
     }
-}
-
-static async updatePassword(req, res) {
+    }
+    static async updatePassword(req, res) {
   const IdE = req.body.IdE;
 
   if (!IdE) {
@@ -167,8 +163,8 @@ static async updatePassword(req, res) {
       console.log(error);
       res.status(500).json({ success: false, message: 'Erreur lors de la mise à jour du mot de passe.', error: error.message });
   }
-}
-static async changeStatut(req, res) {
+   }
+    static async changeStatut(req, res) {
   const Data  = {...req.body};
   try {
     
@@ -185,8 +181,8 @@ static async changeStatut(req, res) {
     console.error("Erreur lors de la mise à jour du statut :", error);
     res.status(500).json({ success: false, message: 'Erreur lors de la mise à jour du statut.', error: error.message });
   }
-}
-static async updateProfil(req, res) {
+   }
+   static async updateProfil(req, res) {
   const newData = { ...req.body };
 
   try {
@@ -201,7 +197,7 @@ static async updateProfil(req, res) {
       console.log(error);
       res.status(500).json({ success: false, message: 'Erreur lors de la mise à jour du profil.', error: error.message });
   }
-}
+   }
 }
  
 export default loginController; 

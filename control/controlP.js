@@ -7,7 +7,7 @@ class planingController {
         static async getPlaning(req, res) {
             try {
                 const today = new Date().toISOString().split('T')[0]; // Format de la date : YYYY-MM-DD
-                
+                console.log(today);
                 // Récupérer le nombre d'agents
                 const  Agents = await planingeModel.getAgentCount();
                 
@@ -25,7 +25,7 @@ class planingController {
 
                 const agentRDVDetails = await planingeModel.getAgentRDVDetails(today);
 
-            const agentPeriodicVisits = await planingeModel.getAgentPeriodicVisits();
+            const agentPeriodicVisits = await planingeModel.getAgentPeriodicVisits(today);
 
     
                 res.status(200).json({

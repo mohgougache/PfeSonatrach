@@ -49,5 +49,55 @@ static async getExamenRadioData(IdV) {
             });
         });
     }
+
+    static getAgentById(IdA) {
+        return new Promise((resolve, reject) => {
+            const query = `
+                SELECT Nom, Prenom, DateN
+                FROM agent
+                WHERE IdA = ?
+            `;
+            db.query(query, [IdA], (error, results) => {
+                if (error) {
+                    return reject(error);
+                }
+                resolve(results[0]);
+            });
+        });
+    }
+    static insertDocument(IdV, CodeD) {
+        return new Promise((resolve, reject) => {
+            const query = `
+                INSERT INTO document (IdV, CodeD)
+                VALUES (?, ?)
+            `;
+            db.query(query, [IdV, CodeD], (error, results) => {
+                if (error) {
+                    return reject(error);
+                }
+                resolve(results);
+            });
+        });}
+
+        static getDoctorById(IdE) {
+            return new Promise((resolve, reject) => {
+                const query = `
+                    SELECT Nom, Prenom
+                    FROM profil
+                    WHERE IdE = ?
+                `;
+                db.query(query, [IdE], (error, results) => {
+                    if (error) {
+                        return reject(error);
+                    }
+                    console.log(results);
+                    if (results.length === 0) {
+                        return resolve(null); // Médecin non trouvé
+                    }
+                    console.log(results);
+                    resolve(results);
+                });
+            });
+        }
 }
 export default pdfModel;

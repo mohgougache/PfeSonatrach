@@ -1,6 +1,8 @@
 // import { type } from "express/lib/response.js";
 import db from "../baseDonne/connection.js";
 import moment from 'moment';
+import { addDays } from 'date-fns';
+
 class AgentModule{
     
     
@@ -731,14 +733,25 @@ static async examenradio(CodeX, radios, IdV) {
     });
 }
 
-static async medicament(CodeMd, medicaments, IdV) {
-    const sql = `INSERT INTO medicament (CodeMd, IdV, LiberMd) VALUES ?`;
+static async medicament(medicaments, IdV) {
+    const sql = `INSERT INTO medicament (CodeMd, IdV, LiberMd, Quantite, DateDM, DateFM, Forme, UniteM) VALUES ?`;
 
-    const values = medicaments.map(med => [
-        med.substring(0, 4).toLowerCase(),
-        IdV,
-        med
-    ]);
+    const values = medicaments.map(med => {
+        const dateDM = new Date(med.DateDM);
+        const duree = med.Duree; // Assurez-vous que `med` a une propriété `Duree`
+        const dateFM = addDays(dateDM, duree); // Calcule la DateFM en ajoutant la durée à DateDM
+
+        return [
+            med.LiberMd.substring(0, 4).toLowerCase(),
+            IdV,
+            med.LiberMd,
+            med.quantity,
+            med.DateDM,
+            dateFM.toISOString().split('T')[0], // Convertir en format 'YYYY-MM-DD'
+            med.Forme,
+            med.UniteM
+        ];
+    });
 
     return new Promise((resolve, reject) => {
         db.query(sql, [values], (error, result) => {
@@ -752,8 +765,40 @@ static async medicament(CodeMd, medicaments, IdV) {
         });
     });
 }
+static async ajouterResulta(LibreSy, IdV) {
+    const findCodeSyQuery = `SELECT CodeSy FROM symptomes WHERE LibreSy IN (?)`;
+    
+    const codeSyRows = await new Promise((resolve, reject) => {
+        db.query(findCodeSyQuery, [LibreSy], (error, rows) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
 
+    if (!codeSyRows || codeSyRows.length === 0) {
+        throw new Error('Aucun CodeSy trouvé pour les LibreSy fournis');
+    }
 
+    const values = codeSyRows.map(row => [
+        row.CodeSy,
+        IdV
+    ]);
+
+    const insertResultaQuery = `INSERT INTO resulta (CodeSy, IdV) VALUES ?`;
+
+    return new Promise((resolve, reject) => {
+        db.query(insertResultaQuery, [values], (error, result) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(result);
+            }
+        });
+    });
+}
 }
 
 

@@ -336,22 +336,34 @@ class AgentControl{
     }
     
     static async ajoutermedicament(req, res) {
-        const { IdV, medicaments } = req.body;
+        const { medicaments, IdV } = req.body;
     
         if (!Array.isArray(medicaments) || medicaments.length === 0 || !IdV) {
             return res.status(400).json({ error: 'Le corps de la requête doit contenir un IdV et un tableau de medicaments' });
         }
     
         try {
-            const CodeMd = medicaments[0].substring(0, 4).toLowerCase();
-            const newMedicaments = await agent.medicament(CodeMd, medicaments, IdV);
+            const newMedicaments = await agent.medicament(medicaments, IdV);
             res.status(201).json({ message: 'Médicaments ajoutés avec succès', medicaments: newMedicaments });
         } catch (error) {
             console.error('Erreur lors de l\'ajout des médicaments :', error);
             res.status(500).json({ error: 'Erreur lors de l\'ajout des médicaments' });
         }
     }
-    
-   
+    static async ajouterResulta(req, res) {
+        const { LibreSy, IdV } = req.body;
+
+        if (!Array.isArray(LibreSy) || LibreSy.length === 0 || !IdV) {
+            return res.status(400).json({ error: 'Le corps de la requête doit contenir un IdV et un tableau de LibreSy' });
+        }
+
+        try {
+            const newResulta = await agent.ajouterResulta(LibreSy, IdV);
+            res.status(201).json({ message: 'Resulta ajouté avec succès', resulta: newResulta });
+        } catch (error) {
+            console.error('Erreur lors de l\'ajout du resulta :', error);
+            res.status(500).json({ error: 'Erreur lors de l\'ajout du resulta' });
+        }
+    }    
 }
   export default  AgentControl;

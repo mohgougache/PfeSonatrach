@@ -1,6 +1,6 @@
 // planifing.js (ou planingeModel.js si c'est le bon fichier)
 import db from '../baseDonne/connection.js'; // Assurez-vous du chemin correct vers votre connexion DB
-
+import { subMonths, subDays } from 'date-fns';
 class planifingModel {
     static getAgentCount() {
         return new Promise((resolve, reject) => {
@@ -184,12 +184,14 @@ class planifingModel {
             });
         });
     }
-    static getAgentPeriodicVisits() {
-        return new Promise((resolve, reject) => {
-            const currentDate = new Date(); // Date actuelle
-        const threeMonthsAgo = new Date(currentDate);
-        threeMonthsAgo.setMonth(currentDate.getMonth() - 3);
     
+    static getAgentPeriodicVisits(today) {
+        return new Promise((resolve, reject) => {
+            // Calculer la date 3 mois moins 3 jours avant aujourd'hui
+            const targetDate = subDays(subMonths(new Date(today), 3), 3);
+            console.log(targetDate);
+            const formattedDate = targetDate.toISOString().split('T')[0]; // Formater la date pour la requête SQL
+             console.log(formattedDate);
             const query = `
                 SELECT 
                     a.IdA,
@@ -197,16 +199,18 @@ class planifingModel {
                     a.Prenom,
                     a.Email,
                     r.Typerdv
+                   
                 FROM 
                     agent a
                     JOIN rdv r ON a.IdA = r.IdA
                     JOIN visite v ON r.IdR = v.IdR
                 WHERE 
                     r.Typerdv = 'periodice'
-                    AND r.date = ?  
-                    AND v.Statut = 1`;
-    
-            db.query(query, [threeMonthsAgo], (error, rows) => {
+                    AND v.created_at = ?
+                    AND v.Statut = 1
+            `;
+
+            db.query(query, [formattedDate], (error, rows) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -215,7 +219,6 @@ class planifingModel {
             });
         });
     }
-    
     
     
 }

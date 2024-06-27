@@ -46,8 +46,10 @@ router.post("/api/examenbiologique",controlA.ajouterexamenbiologique);
 router.post("/api/examenradio",controlA.ajouterradio);
 router.post("/api/medicament",controlA.ajoutermedicament);
 router.post('/api/ordordenence', PDFController.createPDF);
+router.post('/api/BonS', PDFController.getCertificate);
 router.get('/api/plan', Plan.getPlaning);
 router.post('/api/stat', stat.getMonthlyStatistics);
+router.post('/api/dossie', controlA.ajouterResulta); 
 
  
 export default router;  
