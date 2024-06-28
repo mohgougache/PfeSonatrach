@@ -8,7 +8,7 @@ class logModele {
         try {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(Password, salt);
-            console.log("Hachage du mot de passe :", hashedPassword); // Journal de débogage
+            console.log("Hachage du mot de passe :", hashedPassword); 
 
             const result = await new Promise((resolve, reject) => {
                 const query = 'INSERT INTO profil (IdE, Nom, Prenom, Password, Email, Poste, statut) VALUES (?, ?, ?, ?, ?, ?, ?)';

@@ -109,6 +109,7 @@ class statisticModel {
             });
         });
     }
+
 }
 
 export default statisticModel;
