@@ -10,10 +10,12 @@ app.use(router);
 app.use((req, res, next) => {
   res.status(404).send("Sorry can't find that!");
 });
+app.post("/authenticate", async (req, res) => {
+  const { username } = req.body;
+  return res.json({ username: username, secret: "sha256..." });
+});
 
-
- 
-    
+   
 app.listen(3005, () => { 
   console.log(`Serveur prêt sur le port 3002`);    
 });  

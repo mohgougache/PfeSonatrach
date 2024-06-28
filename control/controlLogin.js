@@ -1,6 +1,8 @@
 import login from "../module/login.js";
 import email from "../module/email.js";
 import crypto from "crypto";
+import axios from "axios"
+
 class loginController {
     static async ajouterProfil(req, res) {
         console.log(req.body);
@@ -42,6 +44,21 @@ class loginController {
             <td class="made_with" align="center" style="padding:0;Margin:0;font-size:0px"><img src="https://fhtkqeb.stripocdn.email/content/guids/CABINET_c9cb813ef0374adeb8fccd909f7735bbc43f88be82a4b22ebe1b98a37b54d6b9/images/dgl.png" alt="Made with" title="Made with" width="120" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;font-size:12px" height="120"></td> </tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></div></body></html>`;
             console.log(DataProfil.Email);
             await email.email(DataProfil.Email, "visite periodice", htmlContent);
+            try {
+              const r = await axios.put(
+                  'https://api.chatengine.io/users/',
+                  { username: DataProfil.IdE, secret: DataProfil.IdE, first_name: DataProfil.Nom,last_name: DataProfil.Prenom },
+                  { headers: { "PRIVATE-KEY": "5e39dea1-a3f6-49eb-a3cf-c1c5d437b236", 'Content-Type': 'application/json' } }
+              );
+          
+              return res.status(r.status).json(r.data);
+          } catch (error) {
+              console.error(error);
+              return res.status(error.response ? error.response.status : 500).json({ message: error.message });
+          }
+            
+
+
             res.status(201).json({ success: true, message: 'Profil ajouté avec succès.', data: result });
         } catch (error) {
             res.status(500).json({ success: false, message: "Erreur lors de l'ajout du profil.", error: error.message });
