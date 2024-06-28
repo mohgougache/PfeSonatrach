@@ -11,11 +11,9 @@ class planingController {
                 // Récupérer le nombre d'agents
                 const  Agents = await planingeModel.getAgentCount();
                 
-                // Récupérer le nombre de visites préparées pour aujourd'hui
-                const  PreparerVisite = await planingeModel.getVisitePreparedCount(today);
-    
-                // Récupérer le nombre de documents sortis pour aujourd'hui
-                const Visite  = await planingeModel.getDocumentCount(today); 
+                // Récupérer le nombre de visites  pour aujourd'hui
+                
+                const Visite  = await planingeModel.getVisitePreparedCount(today);
 
                   // Récupérer le nombre de rendez-vous pour aujourd'hui
                 const  Rdv = await planingeModel.getRDVCount(today);
@@ -30,7 +28,6 @@ class planingController {
     
                 res.status(200).json({
                     Agents,
-                    PreparerVisite,
                     Visite ,
                     Rdv,
                     VisteType,

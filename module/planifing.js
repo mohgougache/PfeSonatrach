@@ -36,27 +36,7 @@ class planifingModel {
         });
     }
 
-    static getDocumentCount(today) {
-        return new Promise((resolve, reject) => {
-            const query = `
-                SELECT COUNT(*) AS documentCount 
-                FROM document d
-                INNER JOIN visite v ON d.IdV = v.IdV
-                WHERE v.created_at = ?`;
-            
-            db.query(query, [today], (error, rows) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    if (!rows || !Array.isArray(rows) || rows.length === 0) {
-                        reject(new Error('Aucun résultat trouvé pour getDocumentCount'));
-                    } else {
-                        resolve(rows[0].documentCount);
-                    }
-                }
-            });
-        });
-    }
+    
     static getRDVCount(today) {
         return new Promise((resolve, reject) => {
             const query = 'SELECT COUNT(*) AS rdvCount FROM rdv WHERE date = ?';
