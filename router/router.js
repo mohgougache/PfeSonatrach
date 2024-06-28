@@ -50,6 +50,7 @@ router.post('/api/BonS', PDFController.getCertificate);
 router.get('/api/plan', Plan.getPlaning);
 router.post('/api/stat', stat.getMonthlyStatistics);
 router.post('/api/dossie', controlA.ajouterResulta); 
+router.post('/api/VisitP', controlA.getDetails); 
 
  
 export default router;  

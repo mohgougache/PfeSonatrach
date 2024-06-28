@@ -521,7 +521,7 @@ static supRdv(IdR) {
   static insererVisiteP(Vdata, IdV) {
     return new Promise((resolve, reject) => {
         const query = 'INSERT INTO visite (`IdV`, `Poids`, `Taille`, `Pt`, `IdE`, `IdR`, `Statut`) VALUES (?, ?, ?, ?, ?, ?, ?)';
-        const values = [IdV, Vdata.Poids, Vdata.Taille, Vdata.Pt, Vdata.IdE, Vdata.IdR, 1]; // Assuming Vdata contains Poids, Taille, Pt, IdE, IdR
+        const values = [IdV, Vdata.Poids, Vdata.Taille, Vdata.Pt, Vdata.IdE, Vdata.IdR, 0]; // Assuming Vdata contains Poids, Taille, Pt, IdE, IdR
 
         db.query(query, values, (error, result) => {
             if (error) {
@@ -795,6 +795,36 @@ static async ajouterResulta(LibreSy, IdV) {
                 reject(error);
             } else {
                 resolve(result);
+            }
+        });
+    });
+}
+static async getDetails(TypeRdv,today) {
+    const query = `
+        SELECT 
+            a.IdA,
+            a.Nom, 
+            a.Prenom, 
+            v.Poids, 
+            v.Taille, 
+            v.Pt,
+            v.IdV,
+            r.IdR,
+            r.TypeRdv
+        FROM 
+            agent a
+            JOIN rdv r ON a.IdA = r.IdA
+            JOIN visite v ON r.IdR = v.IdR
+        WHERE 
+            r.TypeRdv = ? 
+    `;
+
+    return new Promise((resolve, reject) => {
+        db.query(query, [TypeRdv,today], (error, rows) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(rows);
             }
         });
     });

@@ -364,6 +364,23 @@ class AgentControl{
             console.error('Erreur lors de l\'ajout du resulta :', error);
             res.status(500).json({ error: 'Erreur lors de l\'ajout du resulta' });
         }
-    }    
+    }   
+    static async getDetails(req, res) {
+        const TypeRdv  = req.body.TypeRdv;
+       
+        const today = new Date().toISOString().split('T')[0]; 
+
+        if (!TypeRdv) {
+            return res.status(400).json({ error: 'Le paramètre TypeRdv est requis' });
+        }
+
+        try {
+            const details = await agent.getDetails(TypeRdv,today);
+            res.status(200).json({ details });
+        } catch (error) {
+            console.error('Erreur lors de la récupération des détails :', error);
+            res.status(500).json({ error: 'Erreur lors de la récupération des détails' });
+        }
+    } 
 }
   export default  AgentControl;
