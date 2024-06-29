@@ -666,10 +666,9 @@ static supprimerPrepareVisite(IdV) {
     });
 }
 
-static async maladie(CodeM, maladies, IdV) {
+static async maladie(maladies, IdV) {
     const sql = `INSERT INTO maladie (CodeM, IdV, LiberM) VALUES ?`;
 
-    // Construire un tableau de valeurs pour chaque maladie
     const values = maladies.map(maladie => [
         maladie.substring(0, 4).toLowerCase(),
         IdV,
@@ -689,8 +688,7 @@ static async maladie(CodeM, maladies, IdV) {
     });
 }
 
-
-static async examenbiologique(CodeB, biologiques, IdV) {
+static async examenbiologique(biologiques, IdV) {
     const sql = `INSERT INTO examenbiologique (CodeB, IdV, LiberB) VALUES ?`;
 
     const values = biologiques.map(bio => [
@@ -705,13 +703,14 @@ static async examenbiologique(CodeB, biologiques, IdV) {
                 console.error('Erreur lors de l\'insertion des données de examenbiologique :', error);
                 reject(error);
             } else {
-                console.log('Examen biologiques insérés avec succès :', result);
+                console.log('Examens biologiques insérés avec succès :', result);
                 resolve(result);
             }
         });
     });
 }
-static async examenradio(CodeX, radios, IdV) {
+
+static async examenradio(radios, IdV) {
     const sql = `INSERT INTO examenradio (CodeX, IdV, LiberX) VALUES ?`;
 
     const values = radios.map(radio => [

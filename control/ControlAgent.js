@@ -283,71 +283,41 @@ class AgentControl{
    
     
      
-    static async ajouterMaladies(req, res) {
-        const { IdV, maladies } = req.body;
-    
-        if (!Array.isArray(maladies) || maladies.length === 0 || !IdV) {
-            return res.status(400).json({ error: 'Le corps de la requête doit contenir un IdV et un tableau de maladies' });
+    static async ajouterDonnees(req, res) {
+        const { IdV, maladies, biologiques, radios, medicaments } = req.body;
+        console.log(IdV);
+        // Vérifiez si IdV est fourni
+        if (!IdV) {
+            return res.status(400).json({ error: 'Le corps de la requête doit contenir un IdV' });
         }
-    
+
         try {
-            const CodeM = maladies[0].substring(0, 4).toLowerCase(); // Utiliser le code de la première maladie pour tous
-            const newMaladies = await agent.maladie(CodeM, maladies, IdV);
-            res.status(201).json({ message: 'Maladies ajoutées avec succès', maladies: newMaladies });
+            let result = {};
+
+            if (Array.isArray(maladies) && maladies.length > 0) {
+                const newMaladies = await agent.maladie(maladies, IdV);
+                result.maladies = newMaladies;
+            }
+
+            if (Array.isArray(biologiques) && biologiques.length > 0) {
+                const newBiologiques = await agent.examenbiologique(biologiques, IdV);
+                result.biologiques = newBiologiques;
+            }
+
+            if (Array.isArray(radios) && radios.length > 0) {
+                const newRadios = await agent.examenradio(radios, IdV);
+                result.radios = newRadios;
+            }
+
+            if (Array.isArray(medicaments) && medicaments.length > 0) {
+                const newMedicaments = await agent.medicament(medicaments, IdV);
+                result.medicaments = newMedicaments;
+            }
+
+            res.status(201).json({ message: 'Données ajoutées avec succès', result });
         } catch (error) {
-            console.error('Erreur lors de l\'ajout des maladies :', error);
-            res.status(500).json({ error: 'Erreur lors de l\'ajout des maladies' });
-        }
-    }
-    
-    
-    static async ajouterexamenbiologique(req, res) {
-        const { IdV, biologiques } = req.body;
-    
-        if (!Array.isArray(biologiques) || biologiques.length === 0 || !IdV) {
-            return res.status(400).json({ error: 'Le corps de la requête doit contenir un IdV et un tableau de biologiques' });
-        }
-    
-        try {
-            const CodeB = biologiques[0].substring(0, 4).toLowerCase();
-            const newBiologiques = await agent.examenbiologique(CodeB, biologiques, IdV);
-            res.status(201).json({ message: 'Examen biologiques ajoutés avec succès', biologiques: newBiologiques });
-        } catch (error) {
-            console.error('Erreur lors de l\'ajout des examen biologiques :', error);
-            res.status(500).json({ error: 'Erreur lors de l\'ajout des examen biologiques' });
-        }
-    }
-    
-    static async ajouterradio(req, res) {
-        const { IdV, radios } = req.body;
-    
-        if (!Array.isArray(radios) || radios.length === 0 || !IdV) {
-            return res.status(400).json({ error: 'Le corps de la requête doit contenir un IdV et un tableau de radios' });
-        }
-    
-        try {
-            const CodeX = radios[0].substring(0, 4).toLowerCase();
-            const newRadios = await agent.examenradio(CodeX, radios, IdV);
-            res.status(201).json({ message: 'Examens radiologiques ajoutés avec succès', radios: newRadios });
-        } catch (error) {
-            console.error('Erreur lors de l\'ajout des examen radiologiques :', error);
-            res.status(500).json({ error: 'Erreur lors de l\'ajout des examen radiologiques' });
-        }
-    }
-    
-    static async ajoutermedicament(req, res) {
-        const { medicaments, IdV } = req.body;
-    
-        if (!Array.isArray(medicaments) || medicaments.length === 0 || !IdV) {
-            return res.status(400).json({ error: 'Le corps de la requête doit contenir un IdV et un tableau de medicaments' });
-        }
-    
-        try {
-            const newMedicaments = await agent.medicament(medicaments, IdV);
-            res.status(201).json({ message: 'Médicaments ajoutés avec succès', medicaments: newMedicaments });
-        } catch (error) {
-            console.error('Erreur lors de l\'ajout des médicaments :', error);
-            res.status(500).json({ error: 'Erreur lors de l\'ajout des médicaments' });
+            console.error('Erreur lors de l\'ajout des données :', error);
+            res.status(500).json({ error: 'Erreur lors de l\'ajout des données' });
         }
     }
     static async ajouterResulta(req, res) {
