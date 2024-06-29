@@ -764,6 +764,7 @@ static async medicament(medicaments, IdV) {
         });
     });
 }
+
 static async ajouterResulta(LibreSy, IdV) {
     const findCodeSyQuery = `SELECT CodeSy FROM symptomes WHERE LibreSy IN (?)`;
     

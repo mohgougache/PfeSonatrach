@@ -284,8 +284,9 @@ class AgentControl{
     
      
     static async ajouterDonnees(req, res) {
-        const { IdV, maladies, biologiques, radios, medicaments } = req.body;
+        const { IdV, maladies, biologiques, radios, medicaments, LibreSy } = req.body;
         console.log(IdV);
+        
         // Vérifiez si IdV est fourni
         if (!IdV) {
             return res.status(400).json({ error: 'Le corps de la requête doit contenir un IdV' });
@@ -314,27 +315,17 @@ class AgentControl{
                 result.medicaments = newMedicaments;
             }
 
+            if (Array.isArray(LibreSy) && LibreSy.length > 0) {
+                const newResulta = await agent.ajouterResulta(LibreSy, IdV);
+                result.resulta = newResulta;
+            }
+
             res.status(201).json({ message: 'Données ajoutées avec succès', result });
         } catch (error) {
             console.error('Erreur lors de l\'ajout des données :', error);
             res.status(500).json({ error: 'Erreur lors de l\'ajout des données' });
         }
     }
-    static async ajouterResulta(req, res) {
-        const { LibreSy, IdV } = req.body;
-
-        if (!Array.isArray(LibreSy) || LibreSy.length === 0 || !IdV) {
-            return res.status(400).json({ error: 'Le corps de la requête doit contenir un IdV et un tableau de LibreSy' });
-        }
-
-        try {
-            const newResulta = await agent.ajouterResulta(LibreSy, IdV);
-            res.status(201).json({ message: 'Resulta ajouté avec succès', resulta: newResulta });
-        } catch (error) {
-            console.error('Erreur lors de l\'ajout du resulta :', error);
-            res.status(500).json({ error: 'Erreur lors de l\'ajout du resulta' });
-        }
-    }   
     static async getDetails(req, res) {
         const TypeRdv  = req.body.TypeRdv;
        
